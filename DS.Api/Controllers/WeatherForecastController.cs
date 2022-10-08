@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace DS.Api.Controllers
 {
@@ -29,6 +30,12 @@ namespace DS.Api.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+        [HttpGet("all")]
+        public IActionResult GetAll()
+        {
+
+            return BadRequest("test") ;
         }
     }
 }

@@ -48,5 +48,26 @@ namespace DS.Api.Base
             return defaultValue;
 
         }
+        protected IActionResult RequestHandler(Action action,int statusCode=200)
+        {
+            var result = DoInTry(action);
+            if (!result.Success && ExceptionHandler != null)
+                ExceptionHandler(result.ExceptionData);
+            if (result.Success)
+                return StatusCode(statusCode,"OK");
+            else
+                return BadRequest(result.ExceptionData.Message);
+        }
+        protected IActionResult RequestHandler<T>(Func<T> func, int statusCode = 200)
+        {
+            var result = DoInTry<T>(func);
+            if (!result.Success && ExceptionHandler != null)
+                ExceptionHandler(result.ExceptionData);
+            if (result.Success)
+                return StatusCode(statusCode, result.Data);
+            else
+                return BadRequest(result.ExceptionData.Message);
+
+        }
     }
 }

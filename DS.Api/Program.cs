@@ -1,6 +1,7 @@
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DS.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration.GetSection("LoggingFile");
@@ -8,7 +9,9 @@ var excutFile = System.Reflection.Assembly.GetExecutingAssembly().Location;
 var logPath = Path.Combine((new FileInfo(excutFile)).DirectoryName, config.Value);
 builder.Logging.AddFile(logPath);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Host.ConfigureContainer<ContainerBuilder>(b => b.RegisterModule(new DS.Api.Module(builder.Configuration)));
+var assemblies = AssemblyProvider.GetAssembliesFromProjects("DS");
+builder.Host.ConfigureContainer<ContainerBuilder>(b => b.RegisterAssemblyModules<Autofac.Module>(assemblies));
+//builder.Host.ConfigureContainer<ContainerBuilder>(b => b.RegisterModule(new DS.Api.Module(builder.Configuration)));
 // Add services to the container.
 
 builder.Services.AddControllers();
