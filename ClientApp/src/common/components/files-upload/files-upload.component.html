@@ -1,0 +1,36 @@
+<div class="file-upload-zone" (dragover)="drag($event)" (dragenter)="drag($event)" (drop)="drop($event)">
+    <p [translate]="'ui.uploadFileInfo'" [translateParams]="uploadParamenter()"></p>
+    <div>
+        <button mat-stroked-button (click)="selectFile($event)">{{'ui.selectFile'|translate}}</button>
+        <input type="file" multiple style="opacity: 0;max-width: 1px;max-height: 1px;" (change)="changFile($event)">
+        <button mat-stroked-button (click)="uploadAll($event)"
+            [disabled]="invalidAll()">{{'ui.uploadAll'|translate}}</button>
+        <button mat-stroked-button (click)="deleteAll($event)">{{'ui.deleteAll'|translate}}</button>
+    </div>
+    <div>
+        <table>
+            <tr *ngFor="let item of selectedFiles | keyvalue">
+                <td>{{item.value.file.name}}</td>
+                <td>
+                    <mat-spinner diameter="10" *ngIf="item.value.state==fileState.run"></mat-spinner>
+                    <mat-icon *ngIf="item.value.state==fileState.success">check_circle</mat-icon>
+                    <mat-icon *ngIf="item.value.state==fileState.failed">report_problem</mat-icon>
+                </td>
+                <td>
+                    <button mat-mini-fab color="accent" aria-label=""
+                        [disabled]="invalid(item.value) || item.value.state!=fileState.start"
+                        (click)="upload(item.value)">
+                        <mat-icon>cloud_upload</mat-icon>
+                    </button>
+                </td>
+                <td>
+                    <button mat-mini-fab color="warn" aria-label="" [disabled]="item.value.state==fileState.run"
+                        (click)="delete(item.key)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</div>
