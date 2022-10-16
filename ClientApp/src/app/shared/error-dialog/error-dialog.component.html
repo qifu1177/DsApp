@@ -1,0 +1,11 @@
+<div mat-dialog-content>
+<div *ngIf="data.error.errorCode=='400'">
+<p *ngFor="let message of data.error.messages">{{message}}</p>
+</div>
+<div *ngIf="data.error.errorCode!='400'">
+    <p>{{data.message}}</p>
+</div>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="close()">{{'ui.close'|translate}}</button>
+</div>

@@ -1,0 +1,40 @@
+<div class="app-container">
+  <mat-card>
+    <mat-card-content>
+      <h2 class="app-h2">{{'ui.register'|translate}}</h2>
+      <div>
+        <validation-input [formInstanz]="instanz" translateLabel="ui.userName" placeholder="" inputType="text"
+          [control]="userNameControl" [matcher]="matcher" errorMessageCall="getErrorMessage" inputKey="userName">
+        </validation-input>
+
+      </div>
+      <div>
+        <validation-input [formInstanz]="instanz" translateLabel="ui.email" placeholder="" inputType="email"
+          [control]="emailControl" [matcher]="matcher" errorMessageCall="getErrorMessage" inputKey="email">
+        </validation-input>
+
+      </div>
+      <div>
+        <validation-input [formInstanz]="instanz" translateLabel="ui.password" placeholder=""
+          inputType="password" [control]="pswControl" [matcher]="matcher" errorMessageCall="getErrorMessage"
+          inputKey="password"></validation-input>
+      </div>
+      <div>
+        <validation-input [formInstanz]="instanz" translateLabel="ui.passwordConfirm" placeholder="" inputType="password"
+          [control]="passwordConfirmControl" [matcher]="matcher" errorMessageCall="getErrorMessage" inputKey="passwordConfirm"
+          erterAction="register" focus="onFocus"></validation-input>
+
+      </div>
+      <section>
+        <div class="app-button-row">
+          <button mat-stroked-button (click)="back()" [disabled]="waiting">{{'ui.back'|translate}}</button>
+          <button mat-stroked-button color="primary" (click)="register()"
+            [disabled]="invalid() || waiting">{{'ui.register'|translate}}</button>
+          
+        </div>
+        <mat-spinner diameter="30" *ngIf="waiting"></mat-spinner>
+      </section>
+
+    </mat-card-content>
+  </mat-card>
+</div>

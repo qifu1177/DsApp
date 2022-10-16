@@ -1,0 +1,53 @@
+<div class="app-container">
+    <mat-card>
+        <mat-card-content>
+            <h2 class="app-h2">{{'ui.userInfo'|translate}}</h2>
+            
+            <div>
+                <mat-stepper orientation="vertical" [linear]="isLinear" #stepper>
+                    <mat-step>
+                        <div>
+                            <ng-template matStepLabel>{{'ui.baseInfo'|translate}}</ng-template>
+                            <validation-input [formInstanz]="instanz" translateLabel="ui.userName" placeholder=""
+                                inputType="text" [control]="userNameControl" [matcher]="matcher"
+                                errorMessageCall="getErrorMessage" inputKey="userName">
+                            </validation-input>
+                        </div>
+                        <div>
+                            <button mat-button (click)="reset('step1')">{{'ui.reset'|translate}}</button>
+                            <button mat-button matStepperNext>{{'ui.next'|translate}}</button>
+                        </div>
+                    </mat-step>
+                    <mat-step>
+                        <div>
+                            <ng-template matStepLabel>{{'ui.info'|translate}}</ng-template>
+                            <mat-form-field class="app-full-width" appearance="fill">
+                                <mat-label>{{'ui.phoneNumber'|translate}}</mat-label>
+                                <input type="text" matInput [formControl]="phoneNumberControl" placeholder="">
+                            </mat-form-field>
+                            <mat-slide-toggle [(ngModel)]="isMarried">{{(isMarried?'ui.married':'ui.unmarried')|translate}}</mat-slide-toggle>
+                           <files-upload [formInstanz]="instanz" sendAction='uploadFile' [uploadFileTypes]="setting.uploadFileTypes" [maxUploadFileSize]="response.maxUploadFileSize"></files-upload>
+                        </div>
+                        <div>
+                            <button mat-button matStepperPrevious>{{'ui.back'|translate}}</button>
+                            <button mat-button (click)="reset('step2')">{{'ui.reset'|translate}}</button>
+                            
+                        </div>
+
+                    </mat-step>
+                    
+                </mat-stepper>
+            </div>
+            <section>
+                <div class="app-button-row">
+                    <button mat-stroked-button (click)="back()" [disabled]="waiting">{{'ui.back'|translate}}</button>
+                    <button mat-stroked-button color="primary" (click)="save()"
+                        [disabled]="invalid() || waiting">{{'ui.save'|translate}}</button>
+
+                </div>
+                <mat-spinner diameter="30" *ngIf="waiting"></mat-spinner>
+            </section>
+
+        </mat-card-content>
+    </mat-card>
+</div>

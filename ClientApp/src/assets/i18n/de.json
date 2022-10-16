@@ -1,0 +1,24 @@
+{
+    "en": "Englisch",
+    "de": "Deutsche",
+    "ui": {
+        "login": "Anmelden",
+        "password": "Passwort",
+        "register": "Konto erstellen",
+        "email":"Email",
+        "userName":"Benutzername",
+        "close":"Schließen",
+        "logout":"Abmelden",
+        "back":"Zurück",
+        "changePassword":"Passwort ändern",
+        "married":"verheiratet",
+        "unmarried":"ledig",
+        "uploadFileInfo":"Sie können die Datei mit folgenden Type hochladen {{typeStr}} und Sie haben noch {{maxSize}} Byte frei Platz zu Hochladen."
+    },
+    "messages":{
+        "pageNotFoundTitle":"Seite wurde nicht gefunden",
+        "pageNotFountText":"Die Seite kann nicht gefunden werden!",
+        "required":"{{value}} ist erfordlich!",
+        "emailInvalid":"Keine gültige E-Mail"
+    }
+}
