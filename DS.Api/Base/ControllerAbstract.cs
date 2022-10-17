@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DS.Api.Models.Response;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DS.Api.Base
 {
@@ -23,9 +24,9 @@ namespace DS.Api.Base
             try
             {
                 T data = func();
-                result.Data= data;
+                result.Data = data;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result.ExceptionData = ex;
             }
@@ -38,23 +39,23 @@ namespace DS.Api.Base
             if (!result.Success && ExceptionHandler != null)
                 ExceptionHandler(result.ExceptionData);
         }
-        protected T ResultHandler<T>(Func<T> func,T defaultValue)
+        protected T ResultHandler<T>(Func<T> func, T defaultValue)
         {
-            var result=DoInTry<T>(func);
+            var result = DoInTry<T>(func);
             if (result.Success)
                 return result.Data;
-            else if(ExceptionHandler != null)
+            else if (ExceptionHandler != null)
                 ExceptionHandler(result.ExceptionData);
             return defaultValue;
 
         }
-        protected IActionResult RequestHandler(Action action,int statusCode=200)
+        protected IActionResult RequestHandler(Action action, int statusCode = 200)
         {
             var result = DoInTry(action);
             if (!result.Success && ExceptionHandler != null)
                 ExceptionHandler(result.ExceptionData);
             if (result.Success)
-                return StatusCode(statusCode,"OK");
+                return StatusCode(statusCode, new MessageResponse { Message = "OK" });
             else
                 return BadRequest(result.ExceptionData.Message);
         }
@@ -64,7 +65,7 @@ namespace DS.Api.Base
             if (!result.Success && ExceptionHandler != null)
                 ExceptionHandler(result.ExceptionData);
             if (result.Success)
-                return StatusCode(statusCode, result.Data);
+                return StatusCode(statusCode, new ResultResponse<T> { Value = result.Data });
             else
                 return BadRequest(result.ExceptionData.Message);
 

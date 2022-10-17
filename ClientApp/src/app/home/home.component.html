@@ -1,14 +1,13 @@
 <mat-card>
-    <mat-card-title>Csv Dateien</mat-card-title>
+    <mat-card-title>Csv Dateien</mat-card-title>    
+    <div>
+      <files-upload [formInstanz]="instanz" sendAction='uploadFile' [uploadFileTypes]="uploadFileTypes" [maxUploadFileSize]="maxUploadFileSize"></files-upload>
+    </div>
     <mat-card-subtitle>Dateien</mat-card-subtitle>
-    <mat-card-actions >
-        <div *ngFor="let item of csvs">
-            <button mat-button  (click)="openCsv(item)">{{item}}</button>
-        </div>      
+    <mat-card-actions >        
+        <button *ngFor="let item of csvs" mat-button   (click)="openCsv(item)">{{item}}</button>            
     </mat-card-actions>
-    <mat-card-footer>
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </mat-card-footer>
+    
   </mat-card>
   <br>
   <mat-card>

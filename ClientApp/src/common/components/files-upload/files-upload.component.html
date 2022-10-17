@@ -1,11 +1,11 @@
 <div class="file-upload-zone" (dragover)="drag($event)" (dragenter)="drag($event)" (drop)="drop($event)">
-    <p [translate]="'ui.uploadFileInfo'" [translateParams]="uploadParamenter()"></p>
+    
     <div>
-        <button mat-stroked-button (click)="selectFile($event)">{{'ui.selectFile'|translate}}</button>
+        <button mat-stroked-button (click)="selectFile($event)">Datei wählen</button>
         <input type="file" multiple style="opacity: 0;max-width: 1px;max-height: 1px;" (change)="changFile($event)">
         <button mat-stroked-button (click)="uploadAll($event)"
-            [disabled]="invalidAll()">{{'ui.uploadAll'|translate}}</button>
-        <button mat-stroked-button (click)="deleteAll($event)">{{'ui.deleteAll'|translate}}</button>
+            [disabled]="invalidAll()">Alle hochladen</button>
+        <button mat-stroked-button (click)="deleteAll($event)">Alles löschen</button>
     </div>
     <div>
         <table>

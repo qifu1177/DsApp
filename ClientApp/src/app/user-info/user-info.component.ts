@@ -75,7 +75,7 @@ export class UserInfoComponent extends AutoToLoginComponent implements OnInit {
   }
   uploadFile(fileElement:UploadFileElement){
     let sessionId = Store.get('user').sessionId;
-    this.fileUpload(sessionId,fileElement);
+    //this.fileUpload(sessionId,fileElement);
     
   }
 }

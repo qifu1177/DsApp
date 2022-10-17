@@ -89,14 +89,15 @@ export abstract class HttpBaseComponent extends HttpComponent {
             }
         });
     }
-    fileUpload(sessionId:string,file:UploadFileElement){
+    fileUpload(file:UploadFileElement,callback:callBack<string>){
         file.state=FileState.run;
         let formData:FormData = new FormData();
         formData.append('uploadFile', file.file, file.file.name);        
-        let url:string=this.createUrl(`Files/upload/${sessionId}`);
+        let url:string=this.createUrl(`api/Data/upload/${file.file.name}`);
         this._http.post<MessageResponse>(url, formData).subscribe({
             next: data => {               
                 file.state=FileState.success;
+                callback(data.message);
             },
             error: error => {
                 file.state=FileState.failed;

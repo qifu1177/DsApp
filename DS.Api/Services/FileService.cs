@@ -21,7 +21,7 @@ namespace DS.Api.Services
         }
         public string CopyFile(string path, IFormFile file)
         {
-            string filePath = Path.Combine(path, file.Name);
+            string filePath = Path.Combine(path, file.FileName);
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 file.CopyTo(stream);
