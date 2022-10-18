@@ -1,4 +1,6 @@
-﻿using DS.Api.Base;
+﻿using Ds.Infrastructure.Interfaces.Models;
+using Ds.Infrastructure.Interfaces.Services;
+using DS.Api.Base;
 using DS.Api.Extensions;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,16 +11,22 @@ using System.Text;
 
 namespace DS.Api.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerAbstract
     {
+        private const string RawValue = "raw";
+        private const string Index_Activity = "activity";
+
         private readonly ILogger<DataController> _logger;
         private readonly FileService _fileService;
-        public DataController(ILogger<DataController> logger, FileService fileService)
+        private readonly IIndexCalculator _indexCalculator;
+        public DataController(ILogger<DataController> logger, FileService fileService, IIndexCalculator indexCalculator)
         {
             _logger = logger;
             _fileService = fileService;
+            _indexCalculator = indexCalculator; 
         }
         protected override Action<Exception> ExceptionHandler => (ex) =>
         {
@@ -52,13 +60,58 @@ namespace DS.Api.Controllers
             {
                 var cultureInfo = CultureInfo.GetCultureInfo("en-US");
                 var path = _fileService.GetFilePath();
-                var datas = _fileService.GetValues(path, filename);
-
+                if(!MemoryCaching.TryGetValues(filename,RawValue,out IDtValue[] datas))
+                {
+                    datas = _fileService.GetValues(path, filename).ToArray();
+                    MemoryCaching.SetValues(filename,RawValue,datas);
+                }  
                 StringBuilder stringBuilder = new StringBuilder();
                 List<string> list = new List<string>();
                 DateTimeOffset minDtOffset = mindt.ToDateTimeOffset();
                 DateTimeOffset maxDtOffset = maxdt.ToDateTimeOffset();
                 foreach (var item in datas)
+                {
+                    if (item.Dt >= minDtOffset && item.Dt <= maxDtOffset)
+                        list.Add(string.Format("{0}:{1}", item.Dt.ToJsonStr(), item.Value.ToString("0.###", cultureInfo.NumberFormat)));
+                }
+                int intervall = 1;
+                if (list.Count > 2048)
+                {
+                    intervall = list.Count / 2048;
+                }
+                for (var i = 0; i < list.Count; i += intervall)
+                {
+                    if (i > 0)
+                        stringBuilder.Append(string.Format(";{0}", list[i]));
+                    else
+                        stringBuilder.Append(list[i]);
+                }
+                return stringBuilder.ToString();
+            });
+        }
+        [HttpGet("indexActivity/{filename}/{mindt}/{maxdt}/{delta}/{minv}/{maxv}")]
+        public IActionResult IndexActivity(string filename, long mindt, long maxdt,double delta,double minv,double maxv)
+        {
+            return RequestHandler<string>(() =>
+            {
+                var cultureInfo = CultureInfo.GetCultureInfo("en-US");
+                if(!MemoryCaching.TryGetValues(filename, Index_Activity, out IDtValue[] indexValues))
+                {
+                    var path = _fileService.GetFilePath();
+                    if (!MemoryCaching.TryGetValues(filename, RawValue, out IDtValue[] datas))
+                    {
+                        datas = _fileService.GetValues(path, filename).ToArray();
+                        MemoryCaching.SetValues(filename, RawValue, datas);
+                    }
+                    indexValues = _indexCalculator.IndexActivitiesCalculate(datas, delta, minv, maxv).ToArray();
+                    MemoryCaching.SetValues(filename,Index_Activity,indexValues);
+                }
+                
+                StringBuilder stringBuilder = new StringBuilder();
+                List<string> list = new List<string>();
+                DateTimeOffset minDtOffset = mindt.ToDateTimeOffset();
+                DateTimeOffset maxDtOffset = maxdt.ToDateTimeOffset();
+                foreach (var item in indexValues)
                 {
                     if (item.Dt >= minDtOffset && item.Dt <= maxDtOffset)
                         list.Add(string.Format("{0}:{1}", item.Dt.ToJsonStr(), item.Value.ToString("0.###", cultureInfo.NumberFormat)));

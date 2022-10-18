@@ -15,10 +15,12 @@ namespace Ds.Application
         protected override void Load(ContainerBuilder builder)
         {
             //builder.RegisterType<FileService>().As<FileService>().InstancePerLifetimeScope();
+            RegisterServices(builder);
         }
         private void RegisterServices(ContainerBuilder builder)
         {
-            builder.RegisterType<IDbService>().As<DbServices>().InstancePerLifetimeScope();
+            builder.RegisterType<DbServices>().As<IDbService>().InstancePerLifetimeScope();
+            builder.RegisterType<IndexCalculator>().As<IIndexCalculator>().InstancePerLifetimeScope();
         }
     }
 }

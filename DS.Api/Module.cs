@@ -11,6 +11,7 @@ namespace DS.Api
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<FileService>().As<FileService>().InstancePerLifetimeScope();
+            builder.RegisterModule(new Ds.Application.Module());
         }
     }
 }
