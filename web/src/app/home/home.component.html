@@ -1,0 +1,20 @@
+<mat-card>
+    <mat-card-title>Csv Dateien</mat-card-title>    
+    <div>
+      <files-upload [formInstanz]="instanz" sendAction='uploadFile' [uploadFileTypes]="uploadFileTypes" [maxUploadFileSize]="maxUploadFileSize"></files-upload>
+    </div>
+    <mat-card-subtitle>Dateien</mat-card-subtitle>
+    <mat-card-actions >        
+        <button *ngFor="let item of csvs" mat-button   (click)="openCsv(item)">{{item}}</button>            
+    </mat-card-actions>
+    
+  </mat-card>
+  <br>
+  <mat-card>
+    <mat-card-title>Diagramme</mat-card-title>
+    <mat-card-subtitle></mat-card-subtitle>
+    <mat-card-actions align="end">
+      <button mat-button>Like</button>
+      <button mat-button>SHARE</button>
+    </mat-card-actions>
+  </mat-card>

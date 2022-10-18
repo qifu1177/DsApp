@@ -1,0 +1,8 @@
+{
+    "apiUrl": "https://localhost:7114/",
+    "languageSetting":{
+      "default": "en",
+      "languages": ["en","de"]
+    },
+    "title":"Client"
+  }

@@ -1,0 +1,13 @@
+<div>
+  <mat-toolbar color="primary">
+    <button mat-icon-button class="app-icon" aria-label="Example icon-button with menu icon">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span (click)="goHome()" class="app-home">{{title}}</span>
+    <span class="app-spacer"></span>
+    
+  </mat-toolbar>
+
+</div>
+
+<router-outlet></router-outlet>
