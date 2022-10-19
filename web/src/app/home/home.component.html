@@ -7,14 +7,15 @@
     <mat-card-actions >        
         <button *ngFor="let item of csvs" mat-button   (click)="openCsv(item)">{{item}}</button>            
     </mat-card-actions>
-    
+    <br>
+    <mat-card-subtitle>Diagramm</mat-card-subtitle>
+    <div style="display: block;">
+      <canvas baseChart width="400" height="400"
+                  [data]="lineChartData"
+                  [options]="lineChartOptions"
+                  [type]="lineChartType"
+                  (chartHover)="chartHovered($event)"
+                  (chartClick)="chartClicked($event)"></canvas>
+      </div>
   </mat-card>
-  <br>
-  <mat-card>
-    <mat-card-title>Diagramme</mat-card-title>
-    <mat-card-subtitle></mat-card-subtitle>
-    <mat-card-actions align="end">
-      <button mat-button>Like</button>
-      <button mat-button>SHARE</button>
-    </mat-card-actions>
-  </mat-card>
+  

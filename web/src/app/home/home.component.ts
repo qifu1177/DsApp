@@ -1,10 +1,17 @@
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { HttpBaseComponent } from '../shared/ui-base-http.component';
-import {FileState, UploadFileElement} from 'src/common/components/files-upload/files-upload.component';
-import {ResultResponse} from 'src/models/responses/ResultResponse';
-import {StringArrayResultResponse} from 'src/models/responses/StringArrayResultResponse';
-import {DtValue} from 'src/models/datas/DtValue';
+import { FileState, UploadFileElement } from 'src/common/components/files-upload/files-upload.component';
+import { ResultResponse } from 'src/models/responses/ResultResponse';
+import { StringArrayResultResponse } from 'src/models/responses/StringArrayResultResponse';
+import { DtValue } from 'src/models/datas/DtValue';
 
+import { Chart, ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+import { default as Annotation } from 'chartjs-plugin-annotation';
 
 @Component({
   selector: 'app-page-home',
@@ -23,8 +30,72 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   deltaSecond: number = 5;
   minVal: number = 0;
   maxVal: number = 10000000;
+  //for chart
+  public lineChartType: ChartType = 'line';
+  public lineChartOptions: ChartConfiguration['options'];
+  public lineChartData!: ChartConfiguration['data'];
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  constructor(http: HttpClient, router: Router, location: Location, dialog: MatDialog) {
+    super(http, router, location, dialog);
+    Chart.register(Annotation);
+  }
   ngOnInit() {
+    this.initChart();
     this.loadCsvs();
+  }
+  initChart() {
+    this.lineChartOptions = {
+      elements: {
+        line: {
+          tension: 0.5
+        }
+      },
+      scales: {
+        // We use this empty structure as a placeholder for dynamic theming.
+        x: {
+          type: 'time',
+          time: {
+            // Luxon format string
+            tooltipFormat: 'DD T'
+          },
+          title: {
+            display: true,
+            text: 'Zeit'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: '[kW]'
+          }
+        }
+      }
+    };
+    this.lineChartData = {
+      labels: [],
+      datasets: [{
+        label: 'Wirkleistung',
+        fill: false,
+        data: []
+      }]
+    };
+  }
+  private updateChartDatas() {
+    this.lineChartData.labels?.splice(0, this.lineChartData.labels.length);
+    this.lineChartData.datasets[0].data.splice(0, this.lineChartData.datasets[0].data.length);
+    for (let item of this.rawValue) {
+      this.lineChartData.labels?.push(item.dt);
+      this.lineChartData.datasets[0].data.push(item.value);
+    }
+    this.chart?.update();
+  }
+  // events
+  public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
+    console.log(event, active);
+  }
+
+  public chartHovered({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
+    console.log(event, active);
   }
   loadCsvs() {
     this.get<StringArrayResultResponse>("api/Data/csvs", (data) => {
@@ -55,9 +126,9 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
         this.currentSdt = this.rawValue[0].dt;
         this.currentEdt = this.rawValue[count - 1].dt;
       }
-      if(count>0)
-      {
-        this.loadIndexActivity(sdt,edt);
+      if (count > 0) {
+        this.loadIndexActivity(sdt, edt);
+        this.updateChartDatas();
       }
     });
   }
@@ -80,5 +151,5 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       this.loadCsvs();
     });
   }
-  
+
 }

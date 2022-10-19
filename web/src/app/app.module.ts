@@ -9,6 +9,7 @@ import {StoreConfig,StoreModule} from 'projects/store';
 import {UserState} from 'src/common/stores/user.state';
 import { UserLoginResponse } from 'src/models/responses/UserLoginResponse';
 
+
 @NgModule({
   declarations: [
     AppComponent
@@ -16,7 +17,7 @@ import { UserLoginResponse } from 'src/models/responses/UserLoginResponse';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
+    BrowserAnimationsModule,    
     StoreModule.forRoot<UserLoginResponse>({key:"user", state:new UserState()})
   ],
   providers: [

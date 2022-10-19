@@ -12,7 +12,7 @@ import { ErrorDialog } from './shared/error-dialog/error-dialog.component';
 import {EnterDirective} from 'src/common/directives/enter-directive';
 import {ValitionInput} from 'src/common/components/validation-input/validation-input.component';
 import {FilesUploadComponent} from 'src/common/components/files-upload/files-upload.component';
-
+import { NgChartsModule,NgChartsConfiguration  } from 'ng2-charts';
 const routes: Routes = [
   { path: 'page-not-fount', component: PageNotFoundComponent },
   { path: 'home', component: HomeComponent },  
@@ -37,7 +37,7 @@ export function HttpLoaderFactory(http: HttpClient){
   imports: [
     RouterModule.forRoot(routes),
     ConfigLoaderModule.forRoot(),
-    
+    NgChartsModule,
     FormsModule,
     ReactiveFormsModule,
     MatNativeDateModule,
@@ -53,6 +53,9 @@ export function HttpLoaderFactory(http: HttpClient){
     AppMaterialModule,
     CommonModule,
     HttpClientModule
+  ],
+  providers: [
+    { provide: NgChartsConfiguration, useValue: { generateColors: false }}
   ]
 })
 export class AppRoutingModule { }
