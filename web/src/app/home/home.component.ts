@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild,OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
@@ -52,21 +52,39 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       },
       scales: {
         // We use this empty structure as a placeholder for dynamic theming.
-        x: {
-          type: 'time',
-          time: {
-            // Luxon format string
-            tooltipFormat: 'DD T'
+        x: { 
+          time:{
+            unit:'second'
           },
           title: {
             display: true,
             text: 'Zeit'
           }
         },
-        y: {
+        'y-axis-0': {
+          position:'left',
+          grid:{
+            color:'rgba(255,0,0,0.3)'
+          },
+          ticks:{
+            color:'red',
+          },
           title: {
             display: true,
             text: '[kW]'
+          }
+        },
+        'y-axis-1': {
+          position:'right',
+          grid:{
+            color:'rgba(255,0,0,0.3)'
+          },
+          ticks:{
+            color:'blue',
+          },
+          title: {
+            display: true,
+            text: 'Index Activity'
           }
         }
       }
@@ -75,17 +93,45 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       labels: [],
       datasets: [{
         label: 'Wirkleistung',
-        fill: false,
+        backgroundColor: 'rgba(255,255,255,0)',
+        borderColor: 'rgba(36,117,78,1)',
+        pointBackgroundColor: 'rgba(148,159,177,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+        pointRadius:0,
+        fill: 'origin',
         data: []
-      }]
+      },
+      {
+        label: 'Index Activity',
+        backgroundColor: 'rgba(255,255,255,0)',
+        borderColor: 'rgba(102, 102, 51,1)',
+        pointBackgroundColor: 'rgba(148,159,177,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+        pointRadius:0,
+        fill: 'origin',
+        data: []
+      }
+    ]
     };
   }
   private updateChartDatas() {
     this.lineChartData.labels?.splice(0, this.lineChartData.labels.length);
     this.lineChartData.datasets[0].data.splice(0, this.lineChartData.datasets[0].data.length);
     for (let item of this.rawValue) {
-      this.lineChartData.labels?.push(item.dt);
+      let dtstr=`${item.dt.getDate()}.${item.dt.getMonth()}.${item.dt.getFullYear()} ${item.dt.getHours()}:${item.dt.getMinutes()}:${item.dt.getSeconds()}`;
+      this.lineChartData.labels?.push(dtstr);
       this.lineChartData.datasets[0].data.push(item.value);
+    }
+    this.chart?.update();
+  }
+  private updateChartIndexs() {
+    this.lineChartData.datasets[1].data.splice(0, this.lineChartData.datasets[1].data.length);
+    for (let item of this.indexActivities) {
+      this.lineChartData.datasets[1].data.push(item.value);
     }
     this.chart?.update();
   }
@@ -143,7 +189,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
           this.indexActivities.push(dtval);
         }
       }
-
+      this.updateChartIndexs();
     });
   }
   uploadFile(fileElement: UploadFileElement) {
