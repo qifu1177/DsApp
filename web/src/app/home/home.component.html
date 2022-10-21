@@ -1,21 +1,84 @@
 <mat-card>
-    <mat-card-title>Csv Dateien</mat-card-title>    
-    <div>
-      <files-upload [formInstanz]="instanz" sendAction='uploadFile' [uploadFileTypes]="uploadFileTypes" [maxUploadFileSize]="maxUploadFileSize"></files-upload>
-    </div>
-    <mat-card-subtitle>Dateien</mat-card-subtitle>
-    <mat-card-actions >        
-        <button *ngFor="let item of csvs" mat-button   (click)="openCsv(item)">{{item}}</button>            
-    </mat-card-actions>
-    <br>
-    <mat-card-subtitle>Diagramm</mat-card-subtitle>
-    <div style="display: block; background-color: white;">
-      <canvas baseChart width="400" height="200" 
-                  [data]="lineChartData"
-                  [options]="lineChartOptions"
-                  [type]="lineChartType"
-                  (chartHover)="chartHovered($event)"
-                  (chartClick)="chartClicked($event)"></canvas>
+  <mat-accordion>
+    <mat-expansion-panel hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Dateien
+        </mat-panel-title>
+        <mat-panel-description>
+          Bitte wählen Sie eine Csv Datei aus.
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div>
+        <button *ngFor="let item of csvs" mat-button (click)="openCsv(item)">{{item}}</button>
       </div>
-  </mat-card>
-  
+    </mat-expansion-panel>
+    <mat-expansion-panel (opened)="fileUploadPaneState = true" (closed)="fileUploadPaneState = false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Csv Datei hochladen
+        </mat-panel-title>
+        <mat-panel-description>
+          {{fileUploadPaneState ? 'Auf' : 'Zu'}}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div>
+        <files-upload [formInstanz]="instanz" sendAction='uploadFile' [uploadFileTypes]="uploadFileTypes"
+          [maxUploadFileSize]="maxUploadFileSize"></files-upload>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Einstellung
+        </mat-panel-title>
+        <mat-panel-description>
+          {{panelOpenState ? 'Auf' : 'Zu'}}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Zeitraum</mat-label>
+          <input type="number" matInput [(ngModel)]="deltaSecond" 
+                 placeholder="Zeitraum für Index Activity">          
+        </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Minimum</mat-label>
+          <input type="number" matInput [(ngModel)]="minVal" 
+                 placeholder="Minimum für Index Activity">          
+        </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Maximum</mat-label>
+          <input type="number" matInput [(ngModel)]="maxVal" 
+                 placeholder="Maximum für Index Activity">          
+        </mat-form-field>
+      </div>
+      <div>
+        <button mat-button (click)="reloadIndexActivity()">Index Activity berechnen</button>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-card-subtitle>Diagramm</mat-card-subtitle>
+  <div style="display: block; background-color: white;">
+    <canvas baseChart width="400" height="200" [data]="lineChartData" [options]="lineChartOptions"
+      [type]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+  </div>
+  <div>
+    <dx-range-selector [(value)]="visualRange" (onValueChanged)="zoomChanged($event)">
+      <dxo-size [height]="100"></dxo-size>
+      <dxo-margin [top]="10" [left]="20" [bottom]="10" [right]="20"> </dxo-margin>
+      <dxo-scale
+        [startValue]="currentSdt"
+        [endValue]="currentEdt"
+        minorTickInterval="minute"
+        tickInterval="hour"
+      >
+        <dxo-minor-tick [visible]="false"></dxo-minor-tick>
+        <dxo-label [format]="format"></dxo-label>
+      </dxo-scale>
+      <dxo-slider-marker [format]="format"></dxo-slider-marker>
+      
+    </dx-range-selector>
+  </div>
+</mat-card>

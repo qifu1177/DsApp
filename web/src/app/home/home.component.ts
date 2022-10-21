@@ -1,4 +1,4 @@
-import { Component, ViewChild,OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
@@ -12,12 +12,14 @@ import { DtValue } from 'src/models/datas/DtValue';
 import { Chart, ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { default as Annotation } from 'chartjs-plugin-annotation';
-
+import { DxChartModule, DxRangeSelectorModule } from 'devextreme-angular';
 @Component({
   selector: 'app-page-home',
   templateUrl: './home.component.html'
 })
 export class HomeComponent extends HttpBaseComponent implements OnInit {
+  panelOpenState: boolean = false;
+  fileUploadPaneState: boolean = false;
   csvs: string[] = [];
   instanz: HomeComponent = this;
   uploadFileTypes: string[] = ["csv"];
@@ -27,6 +29,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   currentFile: string = "";
   currentSdt: Date = new Date(0);
   currentEdt: Date = new Date();
+  visualRange: any = { startValue: this.currentSdt, endValue: this.currentEdt };
   deltaSecond: number = 5;
   minVal: number = 0;
   maxVal: number = 10000000;
@@ -52,9 +55,9 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       },
       scales: {
         // We use this empty structure as a placeholder for dynamic theming.
-        x: { 
-          time:{
-            unit:'second'
+        x: {
+          time: {
+            unit: 'second'
           },
           title: {
             display: true,
@@ -62,12 +65,12 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
           }
         },
         'y-axis-0': {
-          position:'left',
-          grid:{
-            color:'rgba(255,0,0,0.3)'
+          position: 'left',
+          grid: {
+            color: 'rgba(255,0,0,0.3)'
           },
-          ticks:{
-            color:'red',
+          ticks: {
+            color: 'red',
           },
           title: {
             display: true,
@@ -75,12 +78,12 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
           }
         },
         'y-axis-1': {
-          position:'right',
-          grid:{
-            color:'rgba(255,0,0,0.3)'
+          position: 'right',
+          grid: {
+            color: 'rgba(255,0,0,0.3)'
           },
-          ticks:{
-            color:'blue',
+          ticks: {
+            color: 'blue',
           },
           title: {
             display: true,
@@ -99,7 +102,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-        pointRadius:0,
+        pointRadius: 0,
         fill: 'origin',
         data: []
       },
@@ -111,18 +114,21 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-        pointRadius:0,
+        pointRadius: 0,
         fill: 'origin',
         data: []
       }
-    ]
+      ]
     };
+  }
+  format(dt: Date): string {
+    return `${dt.getDate()}.${dt.getMonth()}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`;
   }
   private updateChartDatas() {
     this.lineChartData.labels?.splice(0, this.lineChartData.labels.length);
     this.lineChartData.datasets[0].data.splice(0, this.lineChartData.datasets[0].data.length);
     for (let item of this.rawValue) {
-      let dtstr=`${item.dt.getDate()}.${item.dt.getMonth()}.${item.dt.getFullYear()} ${item.dt.getHours()}:${item.dt.getMinutes()}:${item.dt.getSeconds()}`;
+      let dtstr = `${item.dt.getDate()}.${item.dt.getMonth()}.${item.dt.getFullYear()} ${item.dt.getHours()}:${item.dt.getMinutes()}:${item.dt.getSeconds()}`;
       this.lineChartData.labels?.push(dtstr);
       this.lineChartData.datasets[0].data.push(item.value);
     }
@@ -178,6 +184,9 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       }
     });
   }
+  reloadIndexActivity() {
+    this.loadIndexActivity(this.currentSdt.getTime(), this.currentEdt.getTime());
+  }
   loadIndexActivity(sdt: number, edt: number) {
     this.get<ResultResponse>(`api/Data/indexActivity/${this.currentFile}/${sdt}/${edt}/${this.deltaSecond}/${this.minVal}/${this.maxVal}`, (data) => {
       this.indexActivities.splice(0, this.indexActivities.length);
@@ -191,6 +200,13 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       }
       this.updateChartIndexs();
     });
+  }
+  zoomChanged(o:any){
+    let sdt=o.value[0];
+    let edt=o.value[1];
+    if(sdt==this.currentSdt && edt==this.currentEdt)
+      return;
+    this.loadRawDatas(sdt.getTime(),edt.getTime());
   }
   uploadFile(fileElement: UploadFileElement) {
     this.fileUpload(fileElement, (message) => {

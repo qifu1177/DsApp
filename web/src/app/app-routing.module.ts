@@ -13,7 +13,7 @@ import {EnterDirective} from 'src/common/directives/enter-directive';
 import {ValitionInput} from 'src/common/components/validation-input/validation-input.component';
 import {FilesUploadComponent} from 'src/common/components/files-upload/files-upload.component';
 import { NgChartsModule,NgChartsConfiguration  } from 'ng2-charts';
-import { DxChartModule } from 'devextreme-angular';
+import { DxChartModule,DxRangeSelectorModule } from 'devextreme-angular';
 const routes: Routes = [
   { path: 'page-not-fount', component: PageNotFoundComponent },
   { path: 'home', component: HomeComponent },  
@@ -40,6 +40,7 @@ export function HttpLoaderFactory(http: HttpClient){
     ConfigLoaderModule.forRoot(),
     NgChartsModule,
     DxChartModule,
+    DxRangeSelectorModule,
     FormsModule,
     ReactiveFormsModule,
     MatNativeDateModule,

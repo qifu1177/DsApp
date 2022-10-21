@@ -92,10 +92,17 @@ namespace DS.Api.Controllers
         [HttpGet("indexActivity/{filename}/{mindt}/{maxdt}/{delta}/{minv}/{maxv}")]
         public IActionResult IndexActivity(string filename, long mindt, long maxdt,double delta,double minv,double maxv)
         {
+            var cultureInfo = CultureInfo.GetCultureInfo("en-US");
+            
+            string key = string.Format("{0}.{1}", filename, Index_Activity);
+            string value = string.Format("{0}_{1}_{2}", delta.ToString("0.###", cultureInfo.NumberFormat),
+                minv.ToString("0.###", cultureInfo.NumberFormat), maxv.ToString("0.###", cultureInfo.NumberFormat));
+            bool souldCalculate = MemoryCaching.Setting.ContainsKey(key) ? value != MemoryCaching.Setting[key] :true;
+            MemoryCaching.Setting[key] = value;
             return RequestHandler<string>(() =>
             {
-                var cultureInfo = CultureInfo.GetCultureInfo("en-US");
-                if(!MemoryCaching.TryGetValues(filename, Index_Activity, out IDtValue[] indexValues))
+                IDtValue[] indexValues;
+                if(souldCalculate || !MemoryCaching.TryGetValues(filename, Index_Activity, out indexValues))
                 {
                     var path = _fileService.GetFilePath();
                     if (!MemoryCaching.TryGetValues(filename, RawValue, out IDtValue[] datas))
