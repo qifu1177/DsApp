@@ -4,14 +4,16 @@ using DS.Api.Base;
 using DS.Api.Extensions;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DS.Api.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerAbstract
@@ -22,11 +24,13 @@ namespace DS.Api.Controllers
         private readonly ILogger<DataController> _logger;
         private readonly FileService _fileService;
         private readonly IIndexCalculator _indexCalculator;
+
+        private List<IDtValue> indexList;
         public DataController(ILogger<DataController> logger, FileService fileService, IIndexCalculator indexCalculator)
         {
             _logger = logger;
             _fileService = fileService;
-            _indexCalculator = indexCalculator; 
+            _indexCalculator = indexCalculator;
         }
         protected override Action<Exception> ExceptionHandler => (ex) =>
         {
@@ -60,11 +64,11 @@ namespace DS.Api.Controllers
             {
                 var cultureInfo = CultureInfo.GetCultureInfo("en-US");
                 var path = _fileService.GetFilePath();
-                if(!MemoryCaching.TryGetValues(filename,RawValue,out IDtValue[] datas))
+                if (!MemoryCaching.TryGetValues(filename, RawValue, out IDtValue[] datas))
                 {
                     datas = _fileService.GetValues(path, filename).ToArray();
-                    MemoryCaching.SetValues(filename,RawValue,datas);
-                }  
+                    MemoryCaching.SetValues(filename, RawValue, datas);
+                }
                 StringBuilder stringBuilder = new StringBuilder();
                 List<string> list = new List<string>();
                 DateTimeOffset minDtOffset = mindt.ToDateTimeOffset();
@@ -86,57 +90,78 @@ namespace DS.Api.Controllers
                     else
                         stringBuilder.Append(list[i]);
                 }
-                return stringBuilder.ToString();
+                string result= stringBuilder.ToString();
+                return result;
             });
         }
         [HttpGet("indexActivity/{filename}/{mindt}/{maxdt}/{delta}/{minv}/{maxv}")]
-        public IActionResult IndexActivity(string filename, long mindt, long maxdt,double delta,double minv,double maxv)
+        public IActionResult IndexActivity(string filename, long mindt, long maxdt, double delta, double minv, double maxv)
         {
             var cultureInfo = CultureInfo.GetCultureInfo("en-US");
-            
+
             string key = string.Format("{0}.{1}", filename, Index_Activity);
             string value = string.Format("{0}_{1}_{2}", delta.ToString("0.###", cultureInfo.NumberFormat),
                 minv.ToString("0.###", cultureInfo.NumberFormat), maxv.ToString("0.###", cultureInfo.NumberFormat));
-            bool souldCalculate = MemoryCaching.Setting.ContainsKey(key) ? value != MemoryCaching.Setting[key] :true;
+            bool souldCalculate = MemoryCaching.Setting.ContainsKey(key) ? value != MemoryCaching.Setting[key] : true;
             MemoryCaching.Setting[key] = value;
             return RequestHandler<string>(() =>
             {
-                IDtValue[] indexValues;
-                if(souldCalculate || !MemoryCaching.TryGetValues(filename, Index_Activity, out indexValues))
+                var path = _fileService.GetFilePath();
+                IDtValue[] datas;
+                if (!MemoryCaching.TryGetValues(filename, RawValue, out datas))
                 {
-                    var path = _fileService.GetFilePath();
-                    if (!MemoryCaching.TryGetValues(filename, RawValue, out IDtValue[] datas))
-                    {
-                        datas = _fileService.GetValues(path, filename).ToArray();
-                        MemoryCaching.SetValues(filename, RawValue, datas);
-                    }
-                    indexValues = _indexCalculator.IndexActivitiesCalculate(datas, delta, minv, maxv).ToArray();
-                    MemoryCaching.SetValues(filename,Index_Activity,indexValues);
+                    datas = _fileService.GetValues(path, filename).ToArray();
+                    MemoryCaching.SetValues(filename, RawValue, datas);
                 }
-                
+                IDtValue[] indexValues;
+                if (souldCalculate || !MemoryCaching.TryGetValues(filename, Index_Activity, out indexValues))
+                {
+                    indexValues = _indexCalculator.IndexActivitiesCalculate(datas, delta, minv, maxv).ToArray();
+                    MemoryCaching.SetValues(filename, Index_Activity, indexValues);
+                }
+
                 StringBuilder stringBuilder = new StringBuilder();
-                List<string> list = new List<string>();
+
                 DateTimeOffset minDtOffset = mindt.ToDateTimeOffset();
                 DateTimeOffset maxDtOffset = maxdt.ToDateTimeOffset();
-                foreach (var item in indexValues)
-                {
-                    if (item.Dt >= minDtOffset && item.Dt <= maxDtOffset)
-                        list.Add(string.Format("{0}:{1}", item.Dt.ToJsonStr(), item.Value.ToString("0.###", cultureInfo.NumberFormat)));
-                }
+
+                indexList = indexValues.Where(x => x.Dt >= minDtOffset && x.Dt <= maxDtOffset).ToList();
+                List<IDtValue> dataList = datas.Where(x => x.Dt >= minDtOffset && x.Dt <= maxDtOffset).ToList();
+                int i = 0;
+
                 int intervall = 1;
-                if (list.Count > 2048)
+                if (dataList.Count > 2048)
                 {
-                    intervall = list.Count / 2048;
+                    intervall = dataList.Count / 2048;
                 }
-                for (var i = 0; i < list.Count; i += intervall)
+                int startPosition = 0;
+                for (i = 0; i < dataList.Count; i += intervall)
                 {
+                    IDtValue index = GetCurretnIndex(dataList[i].Dt, delta, ref startPosition);
+                    if (index == null)
+                        continue;
+                    string str = string.Format("{0}:{1}", dataList[i].Dt.ToJsonStr(), index.Value.ToString("0.###", cultureInfo.NumberFormat));
                     if (i > 0)
-                        stringBuilder.Append(string.Format(";{0}", list[i]));
+                        stringBuilder.Append(string.Format(";{0}", str));
                     else
-                        stringBuilder.Append(list[i]);
+                        stringBuilder.Append(str);
                 }
-                return stringBuilder.ToString();
+                indexList.Clear();
+                string result = stringBuilder.ToString();
+                return result;
             });
+        }
+        private IDtValue GetCurretnIndex(DateTimeOffset dt, double deltaSecond, ref int startPosition)
+        {
+            for (; startPosition < indexList.Count; startPosition++)
+            {
+                var item = indexList[startPosition];
+                if (dt >= item.Dt && dt <= item.Dt.AddSeconds(deltaSecond))
+                {
+                    return item;
+                }
+            }
+            return null;
         }
         // GET: api/<DataController>
         [HttpGet]

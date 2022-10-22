@@ -39,18 +39,15 @@
       <div>
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Zeitraum</mat-label>
-          <input type="number" matInput [(ngModel)]="deltaSecond" 
-                 placeholder="Zeitraum für Index Activity">          
+          <input type="number" matInput [(ngModel)]="deltaSecond" placeholder="Zeitraum für Index Activity">
         </mat-form-field>
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Minimum</mat-label>
-          <input type="number" matInput [(ngModel)]="minVal" 
-                 placeholder="Minimum für Index Activity">          
+          <input type="number" matInput [(ngModel)]="minVal" placeholder="Minimum für Index Activity">
         </mat-form-field>
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Maximum</mat-label>
-          <input type="number" matInput [(ngModel)]="maxVal" 
-                 placeholder="Maximum für Index Activity">          
+          <input type="number" matInput [(ngModel)]="maxVal" placeholder="Maximum für Index Activity">
         </mat-form-field>
       </div>
       <div>
@@ -60,25 +57,45 @@
   </mat-accordion>
 
   <mat-card-subtitle>Diagramm</mat-card-subtitle>
-  <div style="display: block; background-color: white;">
+  <!-- <div style="display: block; background-color: white;">
     <canvas baseChart width="400" height="200" [data]="lineChartData" [options]="lineChartOptions"
       [type]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+  </div> -->
+  <div>
+    <dx-chart id="chart" [dataSource]="chartData" defaultPane="pane1" title="">
+      <dxi-series pane="pane0" valueField="rawValue" name="Wirkleistung[kW]">
+        
+      </dxi-series>
+      <dxi-series pane="pane1" valueField="indexActivity" name="Index Activity">
+        <dxo-label [visible]="true" [customizeText]="indexActivityCustomizeText">
+        </dxo-label>
+      </dxi-series>
+      <dxo-common-series-settings argumentField="dt" format="dd.MM.yyy HH:mm:ss"></dxo-common-series-settings>
+      <dxi-pane name="pane0"></dxi-pane>
+      <dxi-pane name="pane1"></dxi-pane>
+      <dxi-value-axis pane="pane0">
+        <dxo-grid [visible]="true"></dxo-grid>
+        <dxo-title text="Wirkleistung[kW]"></dxo-title>
+      </dxi-value-axis>
+      <dxi-value-axis pane="pane1">
+        <dxo-grid [visible]="true"></dxo-grid>
+        <dxo-title text="Index Activity"></dxo-title>
+      </dxi-value-axis>
+      <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
+      </dxo-legend>
+      <dxo-export [enabled]="true"></dxo-export>
+    </dx-chart>
   </div>
   <div>
     <dx-range-selector [(value)]="visualRange" (onValueChanged)="zoomChanged($event)">
       <dxo-size [height]="100"></dxo-size>
       <dxo-margin [top]="10" [left]="20" [bottom]="10" [right]="20"> </dxo-margin>
-      <dxo-scale
-        [startValue]="currentSdt"
-        [endValue]="currentEdt"
-        minorTickInterval="minute"
-        tickInterval="hour"
-      >
+      <dxo-scale [startValue]="currentSdt" [endValue]="currentEdt" minorTickInterval="minute" tickInterval="hour">
         <dxo-minor-tick [visible]="false"></dxo-minor-tick>
         <dxo-label [format]="format"></dxo-label>
       </dxo-scale>
       <dxo-slider-marker [format]="format"></dxo-slider-marker>
-      
+
     </dx-range-selector>
   </div>
 </mat-card>

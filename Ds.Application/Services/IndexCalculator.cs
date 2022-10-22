@@ -21,11 +21,9 @@ namespace Ds.Application.Services
                 {
                     if ((value.Dt - values[0].Dt).TotalSeconds > deltaTime)
                     {
-                        results.Add(new DtValue
-                        {
-                            Dt = values[0].Dt,
-                            Value = IndexActivityCalculate(values, minValue, maxValue),
-                        });
+                        var dtval = DtValue.Create(values[0].Dt, IndexActivityCalculate(values, minValue, maxValue));
+                        results.Add(dtval);
+                        
                         values.Clear();
                     }
                 }

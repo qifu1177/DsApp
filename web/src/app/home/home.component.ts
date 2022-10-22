@@ -8,7 +8,7 @@ import { FileState, UploadFileElement } from 'src/common/components/files-upload
 import { ResultResponse } from 'src/models/responses/ResultResponse';
 import { StringArrayResultResponse } from 'src/models/responses/StringArrayResultResponse';
 import { DtValue } from 'src/models/datas/DtValue';
-
+import { ChartData } from 'src/models/datas/ChartData';
 import { Chart, ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { default as Annotation } from 'chartjs-plugin-annotation';
@@ -18,17 +18,19 @@ import { DxChartModule, DxRangeSelectorModule } from 'devextreme-angular';
   templateUrl: './home.component.html'
 })
 export class HomeComponent extends HttpBaseComponent implements OnInit {
+  now: Date = new Date();
   panelOpenState: boolean = false;
   fileUploadPaneState: boolean = false;
   csvs: string[] = [];
   instanz: HomeComponent = this;
   uploadFileTypes: string[] = ["csv"];
   maxUploadFileSize: number = 1000000000;
+  chartData: ChartData[] = [];
   rawValue: DtValue[] = [];
   indexActivities: DtValue[] = [];
   currentFile: string = "";
   currentSdt: Date = new Date(0);
-  currentEdt: Date = new Date();
+  currentEdt!: Date;
   visualRange: any = { startValue: this.currentSdt, endValue: this.currentEdt };
   deltaSecond: number = 5;
   minVal: number = 0;
@@ -40,6 +42,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   constructor(http: HttpClient, router: Router, location: Location, dialog: MatDialog) {
     super(http, router, location, dialog);
+    this.currentEdt = this.now;
     Chart.register(Annotation);
   }
   ngOnInit() {
@@ -124,22 +127,45 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   format(dt: Date): string {
     return `${dt.getDate()}.${dt.getMonth()}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`;
   }
+  wirklesitungCustomizeText(o: any) {
+    return `kW`;
+  }
+
+  indexActivityCustomizeText(o: any) {
+    return ``;
+  }
   private updateChartDatas() {
-    this.lineChartData.labels?.splice(0, this.lineChartData.labels.length);
+    /* this.lineChartData.labels?.splice(0, this.lineChartData.labels.length);
     this.lineChartData.datasets[0].data.splice(0, this.lineChartData.datasets[0].data.length);
     for (let item of this.rawValue) {
       let dtstr = `${item.dt.getDate()}.${item.dt.getMonth()}.${item.dt.getFullYear()} ${item.dt.getHours()}:${item.dt.getMinutes()}:${item.dt.getSeconds()}`;
       this.lineChartData.labels?.push(dtstr);
       this.lineChartData.datasets[0].data.push(item.value);
     }
-    this.chart?.update();
+    this.chart?.update(); */
+    this.chartData.splice(0, this.chartData.length);
+    for (let item of this.rawValue) {
+      let dv: ChartData = { dt: item.dt, rawValue: item.value, indexActivity: null };
+      this.chartData.push(dv);
+    }
   }
   private updateChartIndexs() {
-    this.lineChartData.datasets[1].data.splice(0, this.lineChartData.datasets[1].data.length);
+    /* this.lineChartData.datasets[1].data.splice(0, this.lineChartData.datasets[1].data.length);
     for (let item of this.indexActivities) {
       this.lineChartData.datasets[1].data.push(item.value);
     }
-    this.chart?.update();
+    this.chart?.update(); */
+    let i:number=0;
+    for(let item of this.chartData){
+      if(i>=this.indexActivities.length)
+        break;
+      if(this.indexActivities[i].dt.getTime()==item.dt.getTime())
+      {
+        item.indexActivity=this.indexActivities[i].value;
+        i++;
+      }
+      
+    }
   }
   // events
   public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
@@ -201,12 +227,12 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       this.updateChartIndexs();
     });
   }
-  zoomChanged(o:any){
-    let sdt=o.value[0];
-    let edt=o.value[1];
-    if(sdt==this.currentSdt && edt==this.currentEdt)
+  zoomChanged(o: any) {
+    let sdt = o.value[0];
+    let edt = o.value[1];
+    if (sdt == this.currentSdt && (edt == this.currentEdt || edt == this.now))
       return;
-    this.loadRawDatas(sdt.getTime(),edt.getTime());
+    this.loadRawDatas(sdt.getTime(), edt.getTime());
   }
   uploadFile(fileElement: UploadFileElement) {
     this.fileUpload(fileElement, (message) => {

@@ -1,5 +1,6 @@
 ﻿using Ds.Application.Models;
 using Ds.Infrastructure.Interfaces.Models;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -10,8 +11,8 @@ namespace DS.Api.Services
         public string GetFilePath()
         {
             var excutFile = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string filePaht = (new FileInfo(excutFile)).DirectoryName;
-            var path = Path.Combine(filePaht, "files");
+            string filePath = (new FileInfo(excutFile)).DirectoryName;
+            var path = Path.Combine(filePath, "files");
 
             if (Directory.Exists(path))
                 return path;
@@ -49,6 +50,7 @@ namespace DS.Api.Services
                 var deCultureInfo = CultureInfo.GetCultureInfo("de-DE");
                 using (var stream = new StreamReader(info.FullName))
                 {
+                    Debug.WriteLine($"open file {info.Name}");
                     for (var str = stream.ReadLine(); ; str = stream.ReadLine())
                     {
                         if (string.IsNullOrEmpty(str))
@@ -60,11 +62,10 @@ namespace DS.Api.Services
                             headers.AddRange(strs);
                         else
                         {
-                            yield return new DtValue
-                            {
-                                Dt = new DateTimeOffset(Convert.ToDateTime(string.Format("{0} {1}", strs[0], strs[1]), deCultureInfo.DateTimeFormat)),
-                                Value = Convert.ToDouble(strs[4], deCultureInfo.NumberFormat)
-                            };
+                            var dtvalue = DtValue.Create(new DateTimeOffset(Convert.ToDateTime(string.Format("{0} {1}", strs[0], strs[1]), deCultureInfo.DateTimeFormat)),
+                                Convert.ToDouble(strs[4], deCultureInfo.NumberFormat));                           
+                            
+                            yield return dtvalue;
                         }
 
                     }
