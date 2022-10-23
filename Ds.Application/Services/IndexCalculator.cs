@@ -50,5 +50,67 @@ namespace Ds.Application.Services
                 return sum / (values.Count - 1);
             return sum;
         }
+        public IEnumerable<IStatusData> CaculateStatus(IEnumerable<IDtValue> datas,double standbyLimit, double minDuration)
+        {
+            List<StatusData> list = new List<StatusData>();
+            IDtValue lastDV = null;
+            StatusData currentStatusData = null;
+            foreach (var item in datas)
+            {
+                lastDV=item;
+                string status = item.Value <= standbyLimit ? AppEnums.Status.Standby.ToString() : AppEnums.Status.Productive.ToString();
+                if (currentStatusData==null)
+                {
+                    currentStatusData = StatusData.Create();
+                    currentStatusData.Sdt = item.Dt;
+                    currentStatusData.Value = status;
+                }
+                else
+                {
+                    if(status!=currentStatusData.Value)
+                    {
+                        currentStatusData.Edt=item.Dt;
+                        list.Add(currentStatusData);
+                        currentStatusData = StatusData.Create();
+                        currentStatusData.Sdt = item.Dt;
+                        currentStatusData.Value = status;
+                    }
+                }
+            }
+            if (currentStatusData != null && lastDV != null)
+                currentStatusData.Edt = lastDV.Dt;
+            return MergeStatus(list,minDuration);
+        }
+        private StatusData[] MergeStatus(List<StatusData> list, double minDuration)
+        {
+            List<StatusData> result = new List<StatusData>();
+            for(int i=0;i<list.Count;i++)
+            {
+                if(list[i].Duration>=minDuration)
+                {
+                    if(result.Count>0 && result[result.Count - 1].Value == list[i].Value)
+                    {
+                        result[result.Count - 1].Edt = list[i].Edt;
+                        continue;
+                    }
+                    result.Add(list[i]);
+                    if(result.Count==1)
+                    {
+                        result[0].Sdt = list[0].Sdt;
+                    }
+                }else
+                {
+                    if(result.Count>0)
+                        result[result.Count-1].Edt = list[i].Edt;
+                }
+            }
+            if(result.Count==0 && list.Count>0)
+            {
+                result.Add(list[0]);
+                result[0].Edt = list[list.Count - 1].Edt;
+            }
+                
+            return result.ToArray();
+        }
     }
 }

@@ -63,14 +63,17 @@
   </div> -->
   <div>
     <dx-chart id="chart" [dataSource]="chartData" defaultPane="pane1" title="">
-      <dxi-series pane="pane0" valueField="rawValue" name="Wirkleistung[kW]">
-        
+      <dxi-series pane="pane0" valueField="rawValue" name="Wirkleistung[kW]"> 
       </dxi-series>
       <dxi-series pane="pane1" valueField="indexActivity" name="Index Activity">
         <dxo-label [visible]="true" [customizeText]="indexActivityCustomizeText">
         </dxo-label>
       </dxi-series>
-      <dxo-common-series-settings argumentField="dt" format="dd.MM.yyy HH:mm:ss"></dxo-common-series-settings>
+      <dxo-common-series-settings argumentField="dt"> 
+      </dxo-common-series-settings>
+      <dxo-argument-axis [aggregateByCategory]="true">
+        <dxo-label [format]="format"></dxo-label>
+      </dxo-argument-axis>
       <dxi-pane name="pane0"></dxi-pane>
       <dxi-pane name="pane1"></dxi-pane>
       <dxi-value-axis pane="pane0">
@@ -83,7 +86,7 @@
       </dxi-value-axis>
       <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
       </dxo-legend>
-      <dxo-export [enabled]="true"></dxo-export>
+      <dxo-export [enabled]="false"></dxo-export>
     </dx-chart>
   </div>
   <div>

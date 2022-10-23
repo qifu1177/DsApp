@@ -1,9 +1,12 @@
-﻿using Ds.Infrastructure.Interfaces.Models;
+﻿using Autofac.Features.Metadata;
+using Ds.Application.Models;
+using Ds.Infrastructure.Interfaces.Models;
 using Ds.Infrastructure.Interfaces.Services;
 using DS.Api.Base;
 using DS.Api.Extensions;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -160,8 +163,25 @@ namespace DS.Api.Controllers
                 {
                     return item;
                 }
+                else if (dt < item.Dt)
+                    break;
             }
             return null;
+        }
+        [HttpGet("indexActivity/{filename}/{mindt}/{maxdt}/{standbylimit}/{minduration}")]
+        public IActionResult Status(string filename,long mindt,long maxdt,double standbylimit,double minduration)
+        {
+            var path = _fileService.GetFilePath();
+            return RequestHandler<IEnumerable<IStatusData>>(() =>
+            {
+
+                IDtValue[] indexValues;
+                if (MemoryCaching.TryGetValues(filename, Index_Activity, out indexValues))
+                {
+                    return _indexCalculator.CaculateStatus(indexValues, standbylimit, minduration);
+                }
+                return new StatusData[0];
+            });
         }
         // GET: api/<DataController>
         [HttpGet]

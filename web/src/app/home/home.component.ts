@@ -155,17 +155,22 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       this.lineChartData.datasets[1].data.push(item.value);
     }
     this.chart?.update(); */
+    this.chartData.splice(0, this.chartData.length);
     let i:number=0;
-    for(let item of this.chartData){
-      if(i>=this.indexActivities.length)
-        break;
-      if(this.indexActivities[i].dt.getTime()==item.dt.getTime())
+    for (let item of this.rawValue) {
+      let dv: ChartData = { dt: item.dt, rawValue: item.value, indexActivity: null };
+      if(i<this.indexActivities.length)
       {
-        item.indexActivity=this.indexActivities[i].value;
-        i++;
-      }
-      
+        if(this.indexActivities[i].dt.getTime()==item.dt.getTime())
+        {
+          dv.indexActivity=this.indexActivities[i].value;
+          i++;
+        }
+      }      
+      this.chartData.push(dv);
     }
+    
+    
   }
   // events
   public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {

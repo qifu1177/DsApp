@@ -10,5 +10,6 @@ namespace Ds.Infrastructure.Interfaces.Services
     public interface IIndexCalculator
     {
         IEnumerable<IDtValue> IndexActivitiesCalculate(IEnumerable<IDtValue> datas, double deltaTime, double minValue = 0, double maxValue = double.MaxValue);
+        IEnumerable<IStatusData> CaculateStatus(IEnumerable<IDtValue> datas, double standbyLimit, double minDuration);
     }
 }

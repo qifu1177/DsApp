@@ -19,10 +19,6 @@ namespace Ds.Application.Models
             dv.Value = value;
             return dv;
         }
-        public void d()
-        {
-            object o=new object();
-            var dv=this.MemberwiseClone();
-        }
+       
     }
 }
