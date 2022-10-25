@@ -11,6 +11,10 @@ namespace DS.Api.Extensions
             double v= (dt - DataExtension.JSZeroDt).TotalMilliseconds;
             return string.Format("{0:0}", v);
         }
+        public static long ToJsDate(this DateTimeOffset dt)
+        {
+            return Convert.ToInt64((dt - DataExtension.JSZeroDt).TotalMilliseconds);
+        }
         public static DateTimeOffset ToDateTimeOffset(this long value)
         {
             return new DateTimeOffset(JSZeroDt.AddMilliseconds(value));

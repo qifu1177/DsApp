@@ -4,6 +4,7 @@ using Ds.Infrastructure.Interfaces.Models;
 using Ds.Infrastructure.Interfaces.Services;
 using DS.Api.Base;
 using DS.Api.Extensions;
+using DS.Api.Models.Response;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -93,7 +94,7 @@ namespace DS.Api.Controllers
                     else
                         stringBuilder.Append(list[i]);
                 }
-                string result= stringBuilder.ToString();
+                string result = stringBuilder.ToString();
                 return result;
             });
         }
@@ -168,20 +169,41 @@ namespace DS.Api.Controllers
             }
             return null;
         }
-        [HttpGet("indexActivity/{filename}/{mindt}/{maxdt}/{standbylimit}/{minduration}")]
-        public IActionResult Status(string filename,long mindt,long maxdt,double standbylimit,double minduration)
+        [HttpGet("status/{filename}/{mindt}/{maxdt}/{standbylimit}/{minduration}")]
+        public IActionResult Status(string filename, long mindt, long maxdt, double standbylimit, double minduration)
         {
             var path = _fileService.GetFilePath();
-            return RequestHandler<IEnumerable<IStatusData>>(() =>
+            DateTimeOffset minDtOffset = mindt.ToDateTimeOffset();
+            DateTimeOffset maxDtOffset = maxdt.ToDateTimeOffset();
+            return RequestHandler<StatusReponse[]>(() =>
             {
-
                 IDtValue[] indexValues;
                 if (MemoryCaching.TryGetValues(filename, Index_Activity, out indexValues))
                 {
-                    return _indexCalculator.CaculateStatus(indexValues, standbylimit, minduration);
+                    var status = _indexCalculator.CaculateStatus(indexValues, standbylimit, minduration);
+                    List<StatusReponse> list = new List<StatusReponse>();
+                    foreach (var item in status)
+                    {
+                        if (item.Edt < minDtOffset || item.Sdt > maxDtOffset)
+                            continue;
+                        if (item.Sdt < minDtOffset)
+                            item.Sdt = minDtOffset;
+                        if (item.Edt > maxDtOffset)
+                            item.Edt = maxDtOffset;
+                        list.Add(CreateStatusReponse(item));
+                    }
+                    return list.ToArray();
                 }
-                return new StatusData[0];
+                return new StatusReponse[0];
             });
+        }
+        private StatusReponse CreateStatusReponse(IStatusData item)
+        {
+            StatusReponse statusReponse = ObjectFactory<StatusReponse>.Create();
+            statusReponse.Sdt = item.Sdt.ToJsDate();
+            statusReponse.Edt = item.Edt.ToJsDate();
+            statusReponse.Status = item.Value;
+            return statusReponse;
         }
         // GET: api/<DataController>
         [HttpGet]

@@ -53,6 +53,19 @@
       <div>
         <button mat-button (click)="reloadIndexActivity()">Index Activity berechnen</button>
       </div>
+      <div>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Statndby Wert</mat-label>
+          <input type="number" matInput [(ngModel)]="standbyLimit" placeholder="Statndby Wert für Status">
+        </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Mindestdauer</mat-label>
+          <input type="number" matInput [(ngModel)]="minDuration" placeholder="Mindestdauer für Status">
+        </mat-form-field>        
+      </div>
+      <div>
+        <button mat-button (click)="calculateStatus()">Status berechnen</button>
+      </div>
     </mat-expansion-panel>
   </mat-accordion>
 
@@ -74,8 +87,9 @@
       <dxo-argument-axis [aggregateByCategory]="true">
         <dxo-label [format]="format"></dxo-label>
       </dxo-argument-axis>
-      <dxi-pane name="pane0"></dxi-pane>
-      <dxi-pane name="pane1"></dxi-pane>
+      <dxo-tooltip [enabled]="true" [shared]="true" [customizeTooltip]="customizeTooltip"></dxo-tooltip>
+      <dxi-pane name="pane0" height="240"></dxi-pane>
+      <dxi-pane name="pane1" height="260"></dxi-pane>
       <dxi-value-axis pane="pane0">
         <dxo-grid [visible]="true"></dxo-grid>
         <dxo-title text="Wirkleistung[kW]"></dxo-title>
@@ -83,6 +97,7 @@
       <dxi-value-axis pane="pane1">
         <dxo-grid [visible]="true"></dxo-grid>
         <dxo-title text="Index Activity"></dxo-title>
+        <dxi-constant-line [value]="standbyLimit" dashStyle="dash" [width]="1" color="#00FF00"></dxi-constant-line>
       </dxi-value-axis>
       <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
       </dxo-legend>
