@@ -30,7 +30,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   chartData: ChartData[] = [];
   rawValue: DtValue[] = [];
   indexActivities: DtValue[] = [];
-  status: Status[] = [];
+  statusChartData: Status[] = [];
   currentFile: string = "";
   currentSdt: Date = new Date(0);
   currentEdt!: Date;
@@ -142,17 +142,16 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
     return `kW`;
   }
   customizeTooltip = (info: any) => ({
-    html: `<div><div class='tooltip-header'>${
-      this.format(info.argument)}</div>`
-                + '<div class=\'tooltip-body\'><div class=\'series-name\'>'
-                + `<span class='top-series-name'>${info.points[0].seriesName}</span>`
-                + ': '
-                + `<span class='top-series-value'>${info.points[0].valueText}</span>`
-                + '</div><div class=\'series-name\'>'
-                + `<span class='bottom-series-name'>${info.points[1].seriesName}</span>`
-                + ': '
-                + `<span class='bottom-series-value'>${info.points[1].valueText}</span>`
-                + '</div></div></div>',
+    html: `<div><div class='tooltip-header'>${this.format(info.argument)}</div>`
+      + '<div class=\'tooltip-body\'><div class=\'series-name\'>'
+      + `<span class='top-series-name'>${info.points[0].seriesName}</span>`
+      + ': '
+      + `<span class='top-series-value'>${info.points[0].valueText}</span>`
+      + '</div><div class=\'series-name\'>'
+      + `<span class='bottom-series-name'>${info.points[1].seriesName}</span>`
+      + ': '
+      + `<span class='bottom-series-value'>${info.points[1].valueText}</span>`
+      + '</div></div></div>',
   });
   indexActivityCustomizeText(o: any) {
     return ``;
@@ -247,11 +246,21 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   }
   loadStatus(sdt: number, edt: number) {
     this.get<StatusResponse>(`api/Data/status/${this.currentFile}/${sdt}/${edt}/${this.standbyLimit}/${this.minDuration}`, (data) => {
-      this.status.splice(0, this.status.length);
+      this.statusChartData.splice(0, this.statusChartData.length);
       let vals = data.value;
       for (let val of vals) {
-        let v:Status={Sdt:new Date(val.sdt),Edt:new Date(val.sdt),Value:val.status};
-        this.status.push(v);
+        if (val.status == "Standby") {
+          let v1: Status = { dt: new Date(val.sdt), text: val.status, standby: 1, productive: 0 };
+          this.statusChartData.push(v1);
+          v1 = { dt: new Date(val.edt), text: val.status, standby: 1, productive: 0 };
+          this.statusChartData.push(v1);
+        } else {
+          let v1: Status = { dt: new Date(val.sdt), text: val.status, standby: 0, productive: 1 };
+          this.statusChartData.push(v1);
+          v1 = { dt: new Date(val.edt), text: val.status, standby: 0, productive: 1 };
+          this.statusChartData.push(v1);
+        }
+
       }
       //this.updateChartIndexs();
     });
@@ -262,6 +271,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
     if (this.selectedSdt == this.currentSdt && (this.selectedEdt == this.currentEdt || this.selectedEdt == this.now))
       return;
     this.loadRawDatas(this.selectedSdt.getTime(), this.selectedEdt.getTime());
+    this.loadStatus(this.selectedSdt.getTime(), this.selectedEdt.getTime());
   }
   uploadFile(fileElement: UploadFileElement) {
     this.fileUpload(fileElement, (message) => {

@@ -5,7 +5,7 @@ namespace DS.Api.Base
     public class MemoryCaching
     {
         public static Dictionary<string, IDtValue[]> KeyValuePairs { get; private set; }
-        public static Dictionary<string,string> Setting { get; private set; }
+        public static Dictionary<string, string> Setting { get; private set; }
         static MemoryCaching()
         {
             KeyValuePairs = new Dictionary<string, IDtValue[]>();
@@ -26,8 +26,7 @@ namespace DS.Api.Base
         public static void SetValues(string fileName, string indexName, IDtValue[] dtValues)
         {
             string keyStr = string.Format("{0}-{1}", fileName, indexName);
-            if (!KeyValuePairs.ContainsKey(keyStr))
-                KeyValuePairs[keyStr] = dtValues;
+            KeyValuePairs[keyStr] = dtValues;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Autofac.Features.Metadata;
-using Ds.Application.Models;
+﻿using Ds.Application.Models;
 using Ds.Infrastructure.Interfaces.Models;
 using Ds.Infrastructure.Interfaces.Services;
 using DS.Api.Base;
@@ -8,9 +7,7 @@ using DS.Api.Models.Response;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

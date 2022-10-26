@@ -1,5 +1,6 @@
 export interface Status {
-    Sdt: Date,
-    Edt: Date,
-    Value: string
+    dt: Date,
+    standby: number,
+    text: string,
+    productive: number
 }
