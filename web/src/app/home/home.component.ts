@@ -11,6 +11,7 @@ import { StatusResponse } from 'src/models/responses/StatusResponse';
 import { DtValue } from 'src/models/datas/DtValue';
 import { Status } from 'src/models/datas/Status';
 import { ChartData } from 'src/models/datas/ChartData';
+import { Setting } from 'src/models/datas/Setting';
 import { Chart, ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { default as Annotation } from 'chartjs-plugin-annotation';
@@ -37,13 +38,8 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   selectedSdt!: Date;
   selectedEdt!: Date;
   visualRange: any = { startValue: this.currentSdt, endValue: this.currentEdt };
-  //for index activity
-  deltaSecond: number = 5;
-  minVal: number = 0;
-  maxVal: number = 10000000;
-  //for status
-  standbyLimit: number = 0.5;
-  minDuration: number = 30;
+  setting: Setting = { deltaSecond: 5, minVal: 0, maxVal: 10000, standbyLimit: 0.5, minDuration: 30 };
+
   //for chart
   public lineChartType: ChartType = 'line';
   public lineChartOptions: ChartConfiguration['options'];
@@ -59,6 +55,16 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   ngOnInit() {
     this.initChart();
     this.loadCsvs();
+  }
+  initSetting() {
+    let str = localStorage.getItem(this.currentFile);
+    if (str) {
+      this.setting = JSON.parse(str);
+    }
+  }
+  saveSetting() {
+    if (this.currentFile)
+      localStorage.setItem(this.currentFile, JSON.stringify(this.setting));
   }
   initChart() {
     this.lineChartOptions = {
@@ -198,6 +204,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   }
   openCsv(csv: string) {
     this.currentFile = csv;
+    this.initSetting();    
     this.currentSdt = new Date(0);
     this.currentEdt = new Date();
     this.loadRawDatas(this.currentSdt.getTime(), this.currentEdt.getTime());
@@ -225,13 +232,15 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
     });
   }
   reloadIndexActivity() {
+    this.saveSetting();
     this.loadIndexActivity(this.selectedSdt.getTime(), this.selectedEdt.getTime());
   }
   calculateStatus() {
+    this.saveSetting();
     this.loadStatus(this.selectedSdt.getTime(), this.selectedEdt.getTime());
   }
   loadIndexActivity(sdt: number, edt: number) {
-    this.get<ResultResponse>(`api/Data/indexActivity/${this.currentFile}/${sdt}/${edt}/${this.deltaSecond}/${this.minVal}/${this.maxVal}`, (data) => {
+    this.get<ResultResponse>(`api/Data/indexActivity/${this.currentFile}/${sdt}/${edt}/${this.setting.deltaSecond}/${this.setting.minVal}/${this.setting.maxVal}`, (data) => {
       this.indexActivities.splice(0, this.indexActivities.length);
       let vals = data.value.split(';');
       for (let val of vals) {
@@ -245,7 +254,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
     });
   }
   loadStatus(sdt: number, edt: number) {
-    this.get<StatusResponse>(`api/Data/status/${this.currentFile}/${sdt}/${edt}/${this.standbyLimit}/${this.minDuration}`, (data) => {
+    this.get<StatusResponse>(`api/Data/status/${this.currentFile}/${sdt}/${edt}/${this.setting.standbyLimit}/${this.setting.minDuration}`, (data) => {
       this.statusChartData.splice(0, this.statusChartData.length);
       let vals = data.value;
       for (let val of vals) {

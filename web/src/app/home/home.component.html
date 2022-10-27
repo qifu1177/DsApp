@@ -17,10 +17,7 @@
       <mat-expansion-panel-header>
         <mat-panel-title>
           Csv Datei hochladen
-        </mat-panel-title>
-        <mat-panel-description>
-          {{fileUploadPaneState ? 'Auf' : 'Zu'}}
-        </mat-panel-description>
+        </mat-panel-title>        
       </mat-expansion-panel-header>
       <div>
         <files-upload [formInstanz]="instanz" sendAction='uploadFile' [uploadFileTypes]="uploadFileTypes"
@@ -31,23 +28,20 @@
       <mat-expansion-panel-header>
         <mat-panel-title>
           Einstellung
-        </mat-panel-title>
-        <mat-panel-description>
-          {{panelOpenState ? 'Auf' : 'Zu'}}
-        </mat-panel-description>
+        </mat-panel-title>        
       </mat-expansion-panel-header>
       <div>
         <mat-form-field class="example-full-width" appearance="fill">
-          <mat-label>Zeitraum</mat-label>
-          <input type="number" matInput [(ngModel)]="deltaSecond" placeholder="Zeitraum für Index Activity">
+          <mat-label>Activity Intervall[Sek.]</mat-label>
+          <input type="number" matInput [(ngModel)]="setting.deltaSecond" placeholder="Activity Intervall">
         </mat-form-field>
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Minimum</mat-label>
-          <input type="number" matInput [(ngModel)]="minVal" placeholder="Minimum für Index Activity">
+          <input type="number" matInput [(ngModel)]="setting.minVal" placeholder="Minimum für Index Activity">
         </mat-form-field>
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Maximum</mat-label>
-          <input type="number" matInput [(ngModel)]="maxVal" placeholder="Maximum für Index Activity">
+          <input type="number" matInput [(ngModel)]="setting.maxVal" placeholder="Maximum für Index Activity">
         </mat-form-field>
       </div>
       <div>
@@ -56,11 +50,11 @@
       <div>
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Statndby Wert</mat-label>
-          <input type="number" matInput [(ngModel)]="standbyLimit" placeholder="Statndby Wert für Status">
+          <input type="number" matInput [(ngModel)]="setting.standbyLimit" placeholder="Statndby Wert für Status">
         </mat-form-field>
         <mat-form-field class="example-full-width" appearance="fill">
-          <mat-label>Mindestdauer</mat-label>
-          <input type="number" matInput [(ngModel)]="minDuration" placeholder="Mindestdauer für Status">
+          <mat-label>minimale Statusdauer[Sek.]</mat-label>
+          <input type="number" matInput [(ngModel)]="setting.minDuration" placeholder="minimale Statusdauer">
         </mat-form-field>        
       </div>
       <div>
@@ -88,8 +82,8 @@
         <dxo-label [format]="format"></dxo-label>
       </dxo-argument-axis>
       <dxo-tooltip [enabled]="true" [shared]="true" [customizeTooltip]="customizeTooltip"></dxo-tooltip>
-      <dxi-pane name="pane0" height="240"></dxi-pane>
-      <dxi-pane name="pane1" height="260"></dxi-pane>
+      <dxi-pane name="pane0" height="180"></dxi-pane>
+      <dxi-pane name="pane1" height="190"></dxi-pane>
       <dxi-value-axis pane="pane0">
         <dxo-grid [visible]="true"></dxo-grid>
         <dxo-title text="Wirkleistung[kW]"></dxo-title>
@@ -97,21 +91,21 @@
       <dxi-value-axis pane="pane1">
         <dxo-grid [visible]="true"></dxo-grid>
         <dxo-title text="Index Activity"></dxo-title>
-        <dxi-constant-line [value]="standbyLimit" dashStyle="dash" [width]="1" color="#00FF00"></dxi-constant-line>
+        <dxi-constant-line [value]="setting.standbyLimit" dashStyle="dash" [width]="1" color="#00FF00"></dxi-constant-line>
       </dxi-value-axis>
       <dxo-legend verticalAlignment="top" horizontalAlignment="center">
       </dxo-legend>
       <dxo-export [enabled]="false"></dxo-export>
     </dx-chart>
     <dx-chart id="statusChart" [dataSource]="statusChartData" defaultPane="pane0" title="">
-      <dxi-pane name="pane0" height="120"></dxi-pane>
+      <dxi-pane name="pane0" height="80"></dxi-pane>
       <dxi-value-axis pane="pane0">
         <dxo-grid [visible]="false"></dxo-grid>
         <dxo-title text="Status"></dxo-title>
       </dxi-value-axis>
-      <dxi-series pane="pane0" valueField="standby" color="#008E00" name="Standby">         
+      <dxi-series pane="pane0" valueField="standby" color="#BC0000" name="Standby">         
       </dxi-series>
-      <dxi-series pane="pane0" valueField="productive" color="#BC0000" name="Productive">         
+      <dxi-series pane="pane0" valueField="productive" color="#008E00" name="Productive">         
       </dxi-series>
       <dxo-common-series-settings argumentField="dt" type="area"> 
       </dxo-common-series-settings>
