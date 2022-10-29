@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+    appservice:
+        build: ./
+        ports:
+            - 5011:80
+    website:
+        image: nginx
+        volumes:
+            - ./web/dist:/etc/nginx/templates
+        ports:
+            - 5010:80
+        environment:
+            - NGINX_HOST=things.com
+            - NGINX_PORT=80
+        depends_on:
+            - appservice
