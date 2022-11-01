@@ -1,5 +1,5 @@
 {
-    "apiUrl": "http://localhost:5001/",
+    "apiUrl": "http://localhost:5011/",
     "languageSetting":{
       "default": "en",
       "languages": ["en","de"]

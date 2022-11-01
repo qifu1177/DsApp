@@ -8,7 +8,7 @@ services:
     website:
         image: nginx
         volumes:
-            - ./web/dist:/etc/nginx/templates
+            - ./web/dist/web:/usr/share/nginx/html
         ports:
             - 5010:80
         environment:

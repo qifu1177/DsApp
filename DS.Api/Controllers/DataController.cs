@@ -7,7 +7,6 @@ using DS.Api.Models.Response;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using System.Globalization;
 using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -63,7 +62,7 @@ namespace DS.Api.Controllers
         {
             return RequestHandler<string>(() =>
             {
-                var cultureInfo = CultureInfo.GetCultureInfo("en-US");
+                
                 var path = _fileService.GetFilePath();
                 if (!MemoryCaching.TryGetValues(filename, RawValue, out IDtValue[] datas))
                 {
@@ -77,7 +76,7 @@ namespace DS.Api.Controllers
                 foreach (var item in datas)
                 {
                     if (item.Dt >= minDtOffset && item.Dt <= maxDtOffset)
-                        list.Add(string.Format("{0}:{1}", item.Dt.ToJsonStr(), item.Value.ToString("0.###", cultureInfo.NumberFormat)));
+                        list.Add(string.Format("{0}:{1}", item.Dt.ToJsonStr(), item.Value.ToString("0.###")));
                 }
                 int intervall = 1;
                 if (list.Count > 2048)
@@ -98,11 +97,9 @@ namespace DS.Api.Controllers
         [HttpGet("indexActivity/{filename}/{mindt}/{maxdt}/{delta}/{minv}/{maxv}")]
         public IActionResult IndexActivity(string filename, long mindt, long maxdt, double delta, double minv, double maxv)
         {
-            var cultureInfo = CultureInfo.GetCultureInfo("en-US");
-
             string key = string.Format("{0}.{1}", filename, Index_Activity);
-            string value = string.Format("{0}_{1}_{2}", delta.ToString("0.###", cultureInfo.NumberFormat),
-                minv.ToString("0.###", cultureInfo.NumberFormat), maxv.ToString("0.###", cultureInfo.NumberFormat));
+            string value = string.Format("{0}_{1}_{2}", delta.ToString("0.###"),
+                minv.ToString("0.###"), maxv.ToString("0.###"));
             bool souldCalculate = MemoryCaching.Setting.ContainsKey(key) ? value != MemoryCaching.Setting[key] : true;
             MemoryCaching.Setting[key] = value;
             return RequestHandler<string>(() =>
@@ -141,7 +138,7 @@ namespace DS.Api.Controllers
                     IDtValue index = GetCurretnIndex(dataList[i].Dt, delta, ref startPosition);
                     if (index == null)
                         continue;
-                    string str = string.Format("{0}:{1}", dataList[i].Dt.ToJsonStr(), index.Value.ToString("0.###", cultureInfo.NumberFormat));
+                    string str = string.Format("{0}:{1}", dataList[i].Dt.ToJsonStr(), index.Value.ToString("0.###"));
                     if (i > 0)
                         stringBuilder.Append(string.Format(";{0}", str));
                     else

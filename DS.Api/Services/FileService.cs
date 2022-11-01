@@ -47,7 +47,6 @@ namespace DS.Api.Services
             if (info.Exists)
             {
                 List<string> headers = new List<string>();
-                var deCultureInfo = CultureInfo.GetCultureInfo("de-DE");
                 using (var stream = new StreamReader(info.FullName))
                 {
                     Debug.WriteLine($"open file {info.Name}");
@@ -62,9 +61,11 @@ namespace DS.Api.Services
                             headers.AddRange(strs);
                         else
                         {
-                            var dtvalue = DtValue.Create(new DateTimeOffset(Convert.ToDateTime(string.Format("{0} {1}", strs[0], strs[1]), deCultureInfo.DateTimeFormat)),
-                                Convert.ToDouble(strs[4], deCultureInfo.NumberFormat));                           
-                            
+                            string[] dtstrs = strs[0].Split('.');
+                            string dtstr = string.Format("{0}-{1}-{2}", dtstrs[2], dtstrs[1], dtstrs[0]);
+                            var dtvalue = DtValue.Create(new DateTimeOffset(Convert.ToDateTime(string.Format("{0} {1}", dtstr, strs[1]))),
+                                Convert.ToDouble(strs[4].Replace(',', '.')));
+
                             yield return dtvalue;
                         }
 
