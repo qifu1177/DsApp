@@ -11,5 +11,6 @@ namespace Ds.Infrastructure.Interfaces.Services
     {
         IEnumerable<IDtValue> IndexActivitiesCalculate(IEnumerable<IDtValue> datas, double deltaTime, double minValue = 0, double maxValue = double.MaxValue);
         IEnumerable<IStatusData> CaculateStatus(IEnumerable<IDtValue> datas, double standbyLimit, double minDuration);
+        Dictionary<string, double> IndexTableCalulate(IEnumerable<IDtValue> dtValues, IEnumerable<IStatusData> statuss, double minDelta, double maxDelta);
     }
 }

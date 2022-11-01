@@ -3,6 +3,7 @@ using Ds.Infrastructure.Interfaces.Models;
 using Ds.Infrastructure.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -112,6 +113,115 @@ namespace Ds.Application.Services
             }
 
             return result.ToArray();
+        }
+        public double IndexConditionCalculate(IEnumerable<IDtValue> dtValues, double minDelta, double maxDelta)
+        {
+            double result = 0;
+            double sum = 0;
+            int count = 0;
+            IDtValue lastValue = null;
+            foreach (var dtValue in dtValues)
+            {
+                if (lastValue == null)
+                {
+                    lastValue = dtValue;
+                    continue;
+                }
+                double delta = dtValue.Value - lastValue.Value;
+                if (delta >= minDelta && delta <= maxDelta)
+                {
+                    sum += delta;
+                    count++;
+                }
+                lastValue = dtValue;
+            }
+            if (count > 0)
+                result = sum / count;
+            return result;
+        }
+        public Dictionary<string, double> IndexTableCalulate(IEnumerable<IDtValue> dtValues, IEnumerable<IStatusData> statuss, double minDelta, double maxDelta)
+        {
+            Dictionary<string, double> result = new Dictionary<string, double>();
+            double productiveDuration = 0;
+            int productiveCount = 0;
+            int standbyCount = 0;
+            int iminStatndbyCount = 0;
+            int min10StatndbyCount = 0;
+            int longstStandbyCount = 0;
+            double sumDuration = 0;
+            double productiveConsumption = 0;
+            double sumConsumption = 0;
+            double sumDelta = 0;
+            int deltaCount = 0;
+            IDtValue lastValue = null;
+            var currentStatus = statuss.GetEnumerator();
+            if (currentStatus != null)
+            {
+                StatusIndexCalculate(currentStatus.Current, ref productiveDuration, ref productiveCount,
+                    ref sumDuration, ref standbyCount, ref iminStatndbyCount, ref min10StatndbyCount, ref longstStandbyCount);
+                foreach (var dtValue in dtValues)
+                {
+                    if (dtValue.Dt >= currentStatus.Current.Edt)
+                    {
+                        if (!currentStatus.MoveNext())
+                            break;
+                        StatusIndexCalculate(currentStatus.Current, ref productiveDuration, ref productiveCount,
+                    ref sumDuration, ref standbyCount, ref iminStatndbyCount, ref min10StatndbyCount, ref longstStandbyCount);
+                    }
+                    if (lastValue != null)
+                    {
+                        double delta = dtValue.Value - lastValue.Value;
+                        if (delta >= minDelta && delta <= maxDelta)
+                        {
+                            sumDelta += delta;
+                            deltaCount++;
+                        }
+                        var lastConsumption = lastValue.Value * (dtValue.Dt - lastValue.Dt).TotalHours;
+                        if (currentStatus.Current.Value == AppEnums.Status.Productive.ToString())
+                        {
+                            productiveConsumption += lastConsumption;
+                        }
+                        sumConsumption += lastConsumption;
+                    }
+                    lastValue = dtValue;
+                }
+            }
+            double mtbi = productiveCount > 0 ? productiveDuration / productiveCount : 0;
+            double indexCondition = deltaCount > 0 ? sumDelta / deltaCount : 0;
+            double productivity = sumDuration > 0 ? productiveDuration / sumDuration : 0;
+            double addValue = sumConsumption > 0 ? productiveConsumption / sumConsumption : 0;
+            result["productivity"] = productivity * 100;
+            result["mtbi"] = mtbi / 60;
+            result["standbycount"] = standbyCount;
+            result["1minstatndbycount"] = iminStatndbyCount;
+            result["10minstatndbycount"] = min10StatndbyCount;
+            result["10+minstatndbycount"] = longstStandbyCount;
+            result["addvalue"] = addValue * 100;
+            result["consumption"] = sumConsumption;
+            result["standbyconsumption"] = sumConsumption - productiveConsumption;
+            result["indexcondition"] = indexCondition;
+            return result;
+        }
+        private void StatusIndexCalculate(IStatusData statusData, ref double productiveDuration, ref int productiveCount,
+            ref double sumDuration, ref int standbyCount, ref int iminStatndbyCount, ref int min10StatndbyCount, ref int longstStandbyCount)
+        {
+            double duration = (statusData.Edt - statusData.Sdt).TotalSeconds;
+            if (statusData.Value == AppEnums.Status.Productive.ToString())
+            {
+                productiveCount++;
+                productiveDuration += duration;
+            }
+            else
+            {
+                standbyCount++;
+                if (duration <= 60)
+                    iminStatndbyCount++;
+                else if (duration > 600)
+                    longstStandbyCount++;
+                else
+                    min10StatndbyCount++;
+            }
+            sumDuration += duration;
         }
     }
 }
