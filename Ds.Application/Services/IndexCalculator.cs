@@ -155,7 +155,7 @@ namespace Ds.Application.Services
             int deltaCount = 0;
             IDtValue lastValue = null;
             var currentStatus = statuss.GetEnumerator();
-            if (currentStatus != null)
+            if (currentStatus != null && currentStatus.MoveNext())
             {
                 StatusIndexCalculate(currentStatus.Current, ref productiveDuration, ref productiveCount,
                     ref sumDuration, ref standbyCount, ref iminStatndbyCount, ref min10StatndbyCount, ref longstStandbyCount);
@@ -193,9 +193,9 @@ namespace Ds.Application.Services
             result["productivity"] = productivity * 100;
             result["mtbi"] = mtbi / 60;
             result["standbycount"] = standbyCount;
-            result["1minstatndbycount"] = iminStatndbyCount;
-            result["10minstatndbycount"] = min10StatndbyCount;
-            result["10+minstatndbycount"] = longstStandbyCount;
+            result["min1statndbycount"] = iminStatndbyCount;
+            result["min10statndbycount"] = min10StatndbyCount;
+            result["min10plusstatndbycount"] = longstStandbyCount;
             result["addvalue"] = addValue * 100;
             result["consumption"] = sumConsumption;
             result["standbyconsumption"] = sumConsumption - productiveConsumption;

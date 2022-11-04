@@ -6,10 +6,12 @@ namespace DS.Api.Base
     {
         public static Dictionary<string, IDtValue[]> KeyValuePairs { get; private set; }
         public static Dictionary<string, string> Setting { get; private set; }
+        public static Dictionary<string, IStatusData[]> StatusData { get; private set; }
         static MemoryCaching()
         {
             KeyValuePairs = new Dictionary<string, IDtValue[]>();
             Setting = new Dictionary<string, string>();
+            StatusData = new Dictionary<string, IStatusData[]>();
         }
         public static bool TryGetValues(string fileName, string indexName, out IDtValue[] dtValues)
         {

@@ -4,5 +4,8 @@ export interface Setting {
     maxVal: number,
     //for status
     standbyLimit: number,
-    minDuration: number
+    minDuration: number,
+    //for index tabelle
+    minDelta: number,
+    maxDelta: number
 }

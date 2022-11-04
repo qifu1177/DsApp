@@ -16,6 +16,7 @@ import { Chart, ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { default as Annotation } from 'chartjs-plugin-annotation';
 import { DxChartModule, DxRangeSelectorModule } from 'devextreme-angular';
+import { IndexTabelle, IndexTabelleStatusResponse } from 'src/models/responses/IndexTabelleResponse';
 @Component({
   selector: 'app-page-home',
   templateUrl: './home.component.html'
@@ -32,13 +33,14 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   rawValue: DtValue[] = [];
   indexActivities: DtValue[] = [];
   statusChartData: Status[] = [];
+  indexTabelle: IndexTabelle = { productivity: 0, mtbi: 0, standbycount: 0, min1statndbycount: 0, min10statndbycount: 0, min10plusstatndbycount: 0, addvalue: 0, consumption: 0, standbyconsumption: 0, indexcondition: 0 };
   currentFile: string = "";
   currentSdt: Date = new Date(0);
   currentEdt!: Date;
   selectedSdt!: Date;
   selectedEdt!: Date;
   visualRange: any = { startValue: this.currentSdt, endValue: this.currentEdt };
-  setting: Setting = { deltaSecond: 5, minVal: 0, maxVal: 10000, standbyLimit: 0.5, minDuration: 30 };
+  setting: Setting = { deltaSecond: 5, minVal: 0, maxVal: 10000, standbyLimit: 0.5, minDuration: 30, minDelta: 1, maxDelta: 100 };
 
   //for chart
   public lineChartType: ChartType = 'line';
@@ -204,7 +206,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   }
   openCsv(csv: string) {
     this.currentFile = csv;
-    this.initSetting();    
+    this.initSetting();
     this.currentSdt = new Date(0);
     this.currentEdt = new Date();
     this.loadRawDatas(this.currentSdt.getTime(), this.currentEdt.getTime());
@@ -287,5 +289,13 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       this.loadCsvs();
     });
   }
-
+  indexTabelleCalculate() {
+    this.saveSetting();
+    this.loadIndexTabelle(this.selectedSdt.getTime(), this.selectedEdt.getTime());
+  }
+  loadIndexTabelle(sdt: number, edt: number) {
+    this.get<IndexTabelleStatusResponse>(`api/Data/indextabelle/${this.currentFile}/${sdt}/${edt}/${this.setting.minDelta}/${this.setting.maxDelta}`, (data) => {
+      this.indexTabelle = data.value;
+    });
+  }
 }

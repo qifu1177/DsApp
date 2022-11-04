@@ -60,6 +60,19 @@
       <div>
         <button mat-button (click)="calculateStatus()">Status berechnen</button>
       </div>
+      <div>        
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Mindest Delta</mat-label>
+          <input type="number" matInput [(ngModel)]="setting.minDelta" placeholder="Mindest Delta">
+        </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Maximales Delta</mat-label>
+          <input type="number" matInput [(ngModel)]="setting.maxDelta" placeholder="Maximales Delta">
+        </mat-form-field>
+      </div>
+      <div>
+        <button mat-button (click)="indexTabelleCalculate()">Index Tabelle berechnen</button>
+      </div>
     </mat-expansion-panel>
   </mat-accordion>
 

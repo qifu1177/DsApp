@@ -6,6 +6,7 @@ using DS.Api.Extensions;
 using DS.Api.Models.Response;
 using DS.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Text;
 
@@ -20,6 +21,7 @@ namespace DS.Api.Controllers
     {
         private const string RawValue = "raw";
         private const string Index_Activity = "activity";
+        private const string StatusStr = "satus";
 
         private readonly ILogger<DataController> _logger;
         private readonly FileService _fileService;
@@ -186,6 +188,7 @@ namespace DS.Api.Controllers
                             item.Edt = maxDtOffset;
                         list.Add(CreateStatusReponse(item));
                     }
+                    MemoryCaching.StatusData[$"{filename}_{StatusStr}"] = status.ToArray();
                     return list.ToArray();
                 }
                 return new StatusReponse[0];
@@ -198,6 +201,36 @@ namespace DS.Api.Controllers
             statusReponse.Edt = item.Edt.ToJsDate();
             statusReponse.Status = item.Value;
             return statusReponse;
+        }
+        [HttpGet("indextabelle/{filename}/{mindt}/{maxdt}/{mindelta}/{maxdelta}")]
+        public IActionResult IndexTabelle(string filename,long mindt,long maxdt, double mindelta,double maxdelta)
+        {
+            var path = _fileService.GetFilePath();
+            DateTimeOffset minDtOffset = mindt.ToDateTimeOffset();
+            DateTimeOffset maxDtOffset = maxdt.ToDateTimeOffset();
+            return RequestHandler<Dictionary<string, double>>(() =>
+            {
+                if (MemoryCaching.TryGetValues(filename, RawValue, out IDtValue[] rewValues) &&
+                    MemoryCaching.StatusData.ContainsKey($"{filename}_{StatusStr}"))
+                {
+                    var status = MemoryCaching.StatusData[$"{filename}_{StatusStr}"];
+                    rewValues = rewValues.Where(x => x.Dt >= minDtOffset && x.Dt <= maxDtOffset).ToArray();
+                    List<IStatusData> list = new List<IStatusData>();
+                    foreach (var item in status)
+                    {
+                        if (item.Edt < minDtOffset || item.Sdt > maxDtOffset)
+                            continue;
+                        if (item.Sdt < minDtOffset)
+                            item.Sdt = minDtOffset;
+                        if (item.Edt > maxDtOffset)
+                            item.Edt = maxDtOffset;
+                        list.Add(item);
+                    }
+                    var dic=_indexCalculator.IndexTableCalulate(rewValues,list.ToArray(),mindelta,maxdelta);
+                    return dic;
+                }
+                return new Dictionary<string, double>();
+            });
         }
         // GET: api/<DataController>
         [HttpGet]
