@@ -33,7 +33,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   rawValue: DtValue[] = [];
   indexActivities: DtValue[] = [];
   statusChartData: Status[] = [];
-  indexTabelle: IndexTabelle = { productivity: 0, mtbi: 0, standbycount: 0, min1statndbycount: 0, min10statndbycount: 0, min10plusstatndbycount: 0, addvalue: 0, consumption: 0, standbyconsumption: 0, indexcondition: 0 };
+  indexTabelle: IndexTabelle = { productivity: 0, mtbi: 0, standbycount: 0, min1statndbycount: 0, min10statndbycount: 0, min10plusstatndbycount: 0, addvalue: 0, consumption: 0, standbyconsumption: 0, standbyduration: 0, indexcondition: 0 };
   currentFile: string = "";
   currentSdt: Date = new Date(0);
   currentEdt!: Date;

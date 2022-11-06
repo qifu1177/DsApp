@@ -5,6 +5,7 @@ export interface IndexTabelle {
     min1statndbycount: number;
     min10statndbycount: number;
     min10plusstatndbycount: number;
+    standbyduration: number;
     addvalue: number;
     consumption: number;
     standbyconsumption: number;
@@ -13,4 +14,3 @@ export interface IndexTabelle {
 export interface IndexTabelleStatusResponse {
     value: IndexTabelle;
 }
- 

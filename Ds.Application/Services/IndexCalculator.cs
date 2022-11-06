@@ -191,11 +191,12 @@ namespace Ds.Application.Services
             double productivity = sumDuration > 0 ? productiveDuration / sumDuration : 0;
             double addValue = sumConsumption > 0 ? productiveConsumption / sumConsumption : 0;
             result["productivity"] = productivity * 100;
-            result["mtbi"] = mtbi / 60;
+            result["mtbi"] = mtbi * 1000;
             result["standbycount"] = standbyCount;
             result["min1statndbycount"] = iminStatndbyCount;
             result["min10statndbycount"] = min10StatndbyCount;
             result["min10plusstatndbycount"] = longstStandbyCount;
+            result["standbyduration"] = (sumDuration - productiveDuration) * 1000;
             result["addvalue"] = addValue * 100;
             result["consumption"] = sumConsumption;
             result["standbyconsumption"] = sumConsumption - productiveConsumption;

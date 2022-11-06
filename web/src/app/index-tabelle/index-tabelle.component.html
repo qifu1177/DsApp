@@ -1,0 +1,55 @@
+<table style="width: 1280px;">
+    <tr>
+        <td style="width: 720px; border-right: 1px; border-top: 0px; border-left: 0px; border-bottom: 0px; border-color: gray; border-style:solid;">Produktive Effizienz</td>
+        <td style="width: 380px; border-right: 1px; border-top: 0px; border-left: 0px; border-bottom: 0px; border-color: gray; border-style:solid;">Energetische Effizienz</td>
+        <td style="width: 160px;">Condition Monitoring</td>
+    </tr>
+    <tr>
+        <td style="border-right: 1px; border-top: 0px; border-left: 0px; border-bottom: 0px; border-color: gray; border-style:solid;">
+            <table>
+                <tr style="height: 45px;">
+                    <td style="width: 130px;">Produktivität[%]</td>
+                    <td style="width: 110px;">MTBI</td>
+                    <td style="width: 90px;">Anzahl</td>
+                    <td style="width: 90px;">&lt;1 Min</td>
+                    <td style="width: 90px;">1-10 Min</td>
+                    <td style="width: 90px;">&gt;10 Min</td>
+                    <td style="width: 110px;">Standby Dauer</td>
+                </tr>
+                <tr>
+                    <td>{{data.productivity | number : '1.1-2':'fr'}}</td>
+                    <td>{{data.mtbi | toTimeFormat : 'h'}}</td>
+                    <td>{{data.standbycount | number : '1.0-0' }}</td>
+                    <td>{{data.min1statndbycount | number : '1.0-0' }}</td>
+                    <td>{{data.min10statndbycount | number : '1.0-0' }}</td>
+                    <td>{{data.min10plusstatndbycount | number : '1.0-0' }}</td>
+                    <td>{{data.standbyduration | toTimeFormat}}</td>
+                </tr>
+            </table>
+        </td>
+        <td style="border-right: 1px; border-top: 0px; border-left: 0px; border-bottom: 0px; border-color: gray; border-style:solid;">
+            <table>
+                <tr style="height: 45px;">
+                    <td style="width: 120px;">AddValue[%]</td>
+                    <td style="width: 120px;">Verbrauch</td>
+                    <td style="width: 120px;">Standby Verbrauch</td>                    
+                </tr>
+                <tr>
+                    <td>{{data.addvalue | number : '1.1-2' }}</td>
+                    <td>{{data.consumption | number : '1.1-2' }}</td>
+                    <td>{{data.standbyconsumption | number : '1.1-2'}}</td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table>
+                <tr style="height: 45px;">
+                    <td>Index Condition</td>                
+                </tr>
+                <tr>
+                    <td>{{data.indexcondition | number : '1.1-2'}}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
