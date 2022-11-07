@@ -17,12 +17,12 @@
                     <td style="width: 110px;">Standby Dauer</td>
                 </tr>
                 <tr>
-                    <td>{{data.productivity | number : '1.1-2':'fr'}}</td>
+                    <td>{{data.productivity | number : '1.1-2':'de'}}</td>
                     <td>{{data.mtbi | toTimeFormat : 'h'}}</td>
-                    <td>{{data.standbycount | number : '1.0-0' }}</td>
-                    <td>{{data.min1statndbycount | number : '1.0-0' }}</td>
-                    <td>{{data.min10statndbycount | number : '1.0-0' }}</td>
-                    <td>{{data.min10plusstatndbycount | number : '1.0-0' }}</td>
+                    <td>{{data.standbycount | number : '1.0-0':'de' }}</td>
+                    <td>{{data.min1statndbycount | number : '1.0-0':'de' }}</td>
+                    <td>{{data.min10statndbycount | number : '1.0-0':'de' }}</td>
+                    <td>{{data.min10plusstatndbycount | number : '1.0-0':'de' }}</td>
                     <td>{{data.standbyduration | toTimeFormat}}</td>
                 </tr>
             </table>
@@ -35,9 +35,9 @@
                     <td style="width: 120px;">Standby Verbrauch</td>                    
                 </tr>
                 <tr>
-                    <td>{{data.addvalue | number : '1.1-2' }}</td>
-                    <td>{{data.consumption | number : '1.1-2' }}</td>
-                    <td>{{data.standbyconsumption | number : '1.1-2'}}</td>
+                    <td>{{data.addvalue | number : '1.1-2' :'de'}}</td>
+                    <td>{{data.consumption | number : '1.1-2':'de' }}</td>
+                    <td>{{data.standbyconsumption | number : '1.1-2':'de'}}</td>
                 </tr>
             </table>
         </td>
@@ -47,7 +47,7 @@
                     <td>Index Condition</td>                
                 </tr>
                 <tr>
-                    <td>{{data.indexcondition | number : '1.1-2'}}</td>
+                    <td>{{data.indexcondition | number : '1.1-2':'de'}}</td>
                 </tr>
             </table>
         </td>

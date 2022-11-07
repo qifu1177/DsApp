@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
+import { Location,formatNumber } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpBaseComponent } from '../shared/ui-base-http.component';
 import { FileState, UploadFileElement } from 'src/common/components/files-upload/files-upload.component';
@@ -149,18 +149,21 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
   wirklesitungCustomizeText(o: any) {
     return `kW`;
   }
-  customizeTooltip = (info: any) => ({
+  customizeTooltip = (info: any) => {
+    let rewValueStr=formatNumber(info.points[0].value,'de');
+    let indexActivityValueStr=formatNumber(info.points[1].value,'de');
+    return {      
     html: `<div><div class='tooltip-header'>${this.format(info.argument)}</div>`
       + '<div class=\'tooltip-body\'><div class=\'series-name\'>'
       + `<span class='top-series-name'>${info.points[0].seriesName}</span>`
       + ': '
-      + `<span class='top-series-value'>${info.points[0].valueText}</span>`
+      + `<span class='top-series-value'>${rewValueStr }</span>`
       + '</div><div class=\'series-name\'>'
       + `<span class='bottom-series-name'>${info.points[1].seriesName}</span>`
       + ': '
-      + `<span class='bottom-series-value'>${info.points[1].valueText}</span>`
+      + `<span class='bottom-series-value'>${indexActivityValueStr}</span>`
       + '</div></div></div>',
-  });
+  }};
   indexActivityCustomizeText(o: any) {
     return ``;
   }
@@ -283,6 +286,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
       return;
     this.loadRawDatas(this.selectedSdt.getTime(), this.selectedEdt.getTime());
     this.loadStatus(this.selectedSdt.getTime(), this.selectedEdt.getTime());
+    this.loadIndexTabelle(this.selectedSdt.getTime(), this.selectedEdt.getTime());
   }
   uploadFile(fileElement: UploadFileElement) {
     this.fileUpload(fileElement, (message) => {

@@ -16,6 +16,7 @@ import { NgChartsModule, NgChartsConfiguration } from 'ng2-charts';
 import { DxChartModule, DxRangeSelectorModule } from 'devextreme-angular';
 import { IndexTabelleComponent } from './index-tabelle/index-tabelle.component';
 import { ToTimeFormatPipe } from 'src/common/directives/time-format-pipe';
+import { locale, loadMessages } from "devextreme/localization";
 const routes: Routes = [
   { path: 'page-not-fount', component: PageNotFoundComponent },
   { path: 'home', component: HomeComponent },
@@ -65,4 +66,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     { provide: NgChartsConfiguration, useValue: { generateColors: false } }
   ]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+  constructor() {
+    locale(navigator.language);
+  }
+}
