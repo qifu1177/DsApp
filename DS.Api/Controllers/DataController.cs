@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Text;
+using DS.Api.Base.Filters;
+using DS.Api.Services.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,11 +26,11 @@ namespace DS.Api.Controllers
         private const string StatusStr = "satus";
 
         private readonly ILogger<DataController> _logger;
-        private readonly FileService _fileService;
+        private readonly IFileService _fileService;
         private readonly IIndexCalculator _indexCalculator;
 
         private List<IDtValue> indexList;
-        public DataController(ILogger<DataController> logger, FileService fileService, IIndexCalculator indexCalculator)
+        public DataController(ILogger<DataController> logger, IFileService fileService, IIndexCalculator indexCalculator)
         {
             _logger = logger;
             _fileService = fileService;
@@ -38,6 +40,7 @@ namespace DS.Api.Controllers
         {
             _logger.LogError(ex.Message);
         };
+        [TypeFilter(typeof( FileValidationActionFilter))]
         [HttpPost("upload/{filename}")]
         public IActionResult Upload(string filename)
         {

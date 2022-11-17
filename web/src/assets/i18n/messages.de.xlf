@@ -1,0 +1,4 @@
+<trans-unit datatype="html">
+  <source>Hello i18n!</source>
+  <target>Hallo i18n !</target> 
+</trans-unit>

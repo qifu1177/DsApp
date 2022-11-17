@@ -14,13 +14,7 @@
       "sourceRoot": "src",
       "prefix": "app",
       "i18n": {
-        "sourceLocale": "de-DE",
-        "locales": {
-          "de": {
-            "translation": "src/assets/118n/messages.de.xlf",
-            "baseHref": ""
-          }
-        }       
+        "sourceLocale": "de-DE"
       },
       "architect": {
         "build": {

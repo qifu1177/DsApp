@@ -9,7 +9,11 @@ import {StoreConfig,StoreModule} from 'projects/store';
 import {UserState} from 'src/common/stores/user.state';
 import { UserLoginResponse } from 'src/models/responses/UserLoginResponse';
 
+import { registerLocaleData } from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+import localeDeExtra from '@angular/common/locales/extra/de';
 
+registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 @NgModule({
   declarations: [
     AppComponent

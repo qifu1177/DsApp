@@ -144,7 +144,7 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
     };
   }
   format(dt: Date): string {
-    return `${dt.getDate()}.${dt.getMonth()}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`;
+    return `${dt.getDate()}.${dt.getMonth()+1}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`;
   }
   wirklesitungCustomizeText(o: any) {
     return `kW`;
