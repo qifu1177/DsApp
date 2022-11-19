@@ -1,9 +1,13 @@
-﻿using Ds.Application.Models;
+﻿using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using Ds.Application.Models;
 using Ds.Infrastructure.Interfaces.Models;
 using DS.Api.Base;
 using DS.Api.Services.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 namespace DS.Api.Services
@@ -13,6 +17,7 @@ namespace DS.Api.Services
         public FileService() { }
         public virtual string GetFilePath()
         {
+            //var action = CreateAction();
             var excutFile = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string filePath = (new FileInfo(excutFile)).DirectoryName;
             var path = Path.Combine(filePath, "files");
@@ -48,7 +53,27 @@ namespace DS.Api.Services
             var csvGetValues = CsvInterpretationFactory.Instance.Create(path, fileName);
             if (csvGetValues != null)
                 return csvGetValues.Invoke(path, fileName);
-            return new DtValue[0];            
+            return new DtValue[0];
+        }
+
+        public Action<List<DtValue>, string[]> CreateAction()
+        {
+            Expression<Func<string[], string>> expression = CreateDateTimeFormatStr();
+            Expression<Action<List<DtValue>, string[]>> actionExpression = CreateExpression(expression.Compile());
+            return actionExpression.Compile();
+        }
+        
+        public Expression<Func<string[], string>> CreateDateTimeFormatStr()
+        {
+            Expression<Func<string[], string>>  expression= (strs) => string.Format("{0}-{1}-{2} {4}", strs[2], strs[1], strs[0], strs[1]);
+            return expression;
+        }
+        public Expression<Action<List<DtValue>, string[]>> CreateExpression(Func<string[], string> toDateTimeStr)
+        {
+            Expression<Action<List<DtValue>,string[]>> expression = (list,strs) => list.Add(
+                DtValue.Create(new DateTimeOffset(Convert.ToDateTime(toDateTimeStr(strs))),
+                    Convert.ToDouble(strs[5].Replace(',', '.'))));
+            return expression;
         }
     }
 }

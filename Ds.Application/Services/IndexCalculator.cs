@@ -79,7 +79,16 @@ namespace Ds.Application.Services
                 }
             }
             if (currentStatusData != null && lastDV != null)
+            {
                 currentStatusData.Edt = lastDV.Dt;
+                if (list.Count > 0)
+                {
+                    var last = list[list.Count - 1];
+                    if (last.Sdt != currentStatusData.Sdt)
+                        list.Add(currentStatusData);
+                }
+            }                
+            
             return MergeStatus(list, minDuration);
         }
         private StatusData[] MergeStatus(List<StatusData> list, double minDuration)

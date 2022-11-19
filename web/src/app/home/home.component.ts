@@ -150,8 +150,8 @@ export class HomeComponent extends HttpBaseComponent implements OnInit {
     return `kW`;
   }
   customizeTooltip = (info: any) => {
-    let rewValueStr=formatNumber(info.points[0].value,'de');
-    let indexActivityValueStr=formatNumber(info.points[1].value,'de');
+    let rewValueStr=formatNumber(info.points[0].value,'de-DE');
+    let indexActivityValueStr=formatNumber(info.points[1].value,'de-DE');
     return {      
     html: `<div><div class='tooltip-header'>${this.format(info.argument)}</div>`
       + '<div class=\'tooltip-body\'><div class=\'series-name\'>'
