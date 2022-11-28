@@ -32,5 +32,6 @@ namespace DS.Api.Base
         public string DateFormat { get; set; }
         [JsonProperty("timeformat")]
         public string TimeFormat { get; set; }
+        
     }
 }

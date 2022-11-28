@@ -77,6 +77,8 @@ namespace DS.Api.Services
             var lamda = CsvLamdaFactory.Instacne.GetLamda(JsonConvert.SerializeObject(options));
             var info = new FileInfo(Path.Combine(path, fileName));
             List<DtValue> list = new List<DtValue>();
+            string[] strs = new string[20];
+            double defaultValue = 0;
             using (var stream = new StreamReader(info.FullName))
             {
                 Debug.WriteLine($"open file {info.Name}");
@@ -84,7 +86,7 @@ namespace DS.Api.Services
                 {
                     if (string.IsNullOrEmpty(str))
                         break;
-                    lamda.Invoke(list, str);
+                    lamda.Invoke(list, str,strs,defaultValue);
                 }
             }
             return list;
