@@ -10,11 +10,20 @@ namespace Ds.Application.Models
 {
     public class DtValue : IDtValue
     {
+        private static DtValue _temp;
+        static DtValue()
+        {
+            _temp = new DtValue
+            {
+                Value = 0,
+                Dt=DateTimeOffset.Now
+            };
+        }
         public DateTimeOffset Dt { get; set ; }
         public double Value { get; set; }
         public static DtValue Create(DateTimeOffset dt,double value)
-        {            
-            var dv = ObjectFactory<DtValue>.Create();
+        {
+            DtValue dv = (DtValue)_temp.MemberwiseClone();
             dv.Dt = dt; 
             dv.Value = value;
             return dv;

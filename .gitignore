@@ -1,5 +1,7 @@
-*/bin/*.*
+*/bin/*
 *.dll
 */dist/*
 */files/*
 MongoDB/data/*
+*/obj/*
+.vs/*

@@ -24,6 +24,8 @@ namespace DS.Api.Base
     {
         [JsonProperty("dateposition")]
         public int DatePosition { get; set; }
+        [JsonProperty("datedelimiter")]
+        public string DateDelimiter { get; set; }
         [JsonProperty("timeposition")]
         public int TimePosition { get; set; }
         [JsonProperty("datetimedelimiter")]

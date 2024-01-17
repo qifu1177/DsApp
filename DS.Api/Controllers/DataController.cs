@@ -199,7 +199,7 @@ namespace DS.Api.Controllers
         }
         private StatusReponse CreateStatusReponse(IStatusData item)
         {
-            StatusReponse statusReponse = ObjectFactory<StatusReponse>.Create();
+            StatusReponse statusReponse = new StatusReponse();
             statusReponse.Sdt = item.Sdt.ToJsDate();
             statusReponse.Edt = item.Edt.ToJsDate();
             statusReponse.Status = item.Value;

@@ -59,34 +59,34 @@ namespace DS.Api.Services
         {
             CsvExpressionOptions options = new CsvExpressionOptions { 
                 Delimiter=";",
-                ArrayLength=12,
+                ArrayLength=2,
                 ValueOption=new ValueOption
                 {
-                    Position=5,
+                    Position=1,
                     Decimal=","
                 },
                 DateTimeOption=new DateTimeOption
                 {
                     DatePosition=0,
                     DateFormat="dd.MM.yyyy",
-                    TimePosition=0,
-                    TimeFormat="HH:mm:ss",
+                    DateDelimiter = ".",
+                    TimePosition =0,
+                    TimeFormat="HH:mm",
                     DateTimeDelimiter=" "
                 }
             };
             var lamda = CsvLamdaFactory.Instacne.GetLamda(JsonConvert.SerializeObject(options));
             var info = new FileInfo(Path.Combine(path, fileName));
             List<DtValue> list = new List<DtValue>();
-            string[] strs = new string[20];
-            double defaultValue = 0;
+           
             using (var stream = new StreamReader(info.FullName))
             {
                 Debug.WriteLine($"open file {info.Name}");
                 for (var str = stream.ReadLine(); ; str = stream.ReadLine())
                 {
-                    if (string.IsNullOrEmpty(str))
+                    if (string.IsNullOrWhiteSpace(str))
                         break;
-                    lamda.Invoke(list, str,strs,defaultValue);
+                    lamda.Invoke(list, str.Trim());
                 }
             }
             return list;

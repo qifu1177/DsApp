@@ -15,8 +15,7 @@ namespace Ds.Application.Models
         public double Duration => (Edt - Sdt).TotalSeconds;
         public static StatusData Create()
         {
-            var cloneData = ObjectFactory<StatusData>.Create();
-            return cloneData;
+            return new StatusData();
         }
     }
 }
